@@ -224,13 +224,21 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.1 Public IA hygiene NEXT\*\*/,
+    /Status: \*\*active delivery plan — V3\.3 Source guide vertical proof NEXT\*\*/,
   );
   assert.match(
     slices,
     tableRow("V3.0", "Authority reconciliation", "DONE", "V3 approval"),
   );
-  assert.match(slices, tableRow("V3.1", "Public IA hygiene", "NEXT", "V3.0"));
+  assert.match(slices, tableRow("V3.1", "Public IA hygiene", "DONE", "V3.0"));
+  assert.match(
+    slices,
+    tableRow("V3.2", "AccessRoute contract pilot", "DONE", "V3.0"),
+  );
+  assert.match(
+    slices,
+    tableRow("V3.3", "Source guide vertical proof", "NEXT", "V3.2"),
+  );
   assert.match(slices, /## 7\. Historical V2 phase status/);
   assert.match(
     plan,
@@ -306,13 +314,16 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.1 Public IA hygiene\*\*/,
+    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.3 Source guide vertical proof\*\*/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
-  assert.match(readme, /V3\.0 authority reconciliation is complete\./);
   assert.match(
     readme,
-    /next independently reviewable slice is \*\*V3\.1 — Public IA hygiene\*\*/i,
+    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, and V3\.2 AccessRoute pilot are complete\./,
+  );
+  assert.match(
+    readme,
+    /next independently reviewable slice is \*\*V3\.3 — Motion source-guide proof\*\*/i,
   );
   assert.match(
     slices,

@@ -4,6 +4,7 @@ import {
   getIntelligenceProfile,
   type ResourceIntelligenceProfile,
 } from "./intelligence.ts";
+import { getSourceProfile } from "./source-profiles.ts";
 import {
   buildResearchStack,
   generateMarkdownReferencePacket,
@@ -180,6 +181,7 @@ function createSearchDocument(
 
 function toResourceSummary(resource: CatalogueResource) {
   const profile = getProfile(resource);
+  const sourceProfile = getSourceProfile(resource.id);
 
   return {
     id: resource.id,
@@ -201,6 +203,7 @@ function toResourceSummary(resource: CatalogueResource) {
     frameworks: profile?.frameworks ?? [],
     integrationMethods: profile?.integrationMethods ?? [],
     workflowFit: profile?.workflowFit ?? [],
+    accessRoutes: sourceProfile?.accessRoutes ?? [],
   };
 }
 
