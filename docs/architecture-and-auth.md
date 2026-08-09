@@ -111,7 +111,7 @@ Listed pages render minimum truthful metadata. Profiled and Verified pages progr
 
 ### Machine-readable output and discovery
 
-Current public source and Collection representations are static, deterministic, compact, action-oriented, and derive from canonical source/profile truth. V3.10 may make supported public interfaces discoverable through `robots.txt`, `llms.txt`, sitemap, and For AI links; it must not create a bulk catalogue endpoint or expose Saved or Board data.
+Current public source and Collection representations are static, deterministic, compact, action-oriented, and derive from canonical source/profile truth. V3.10 makes these supported public interfaces discoverable through `robots.txt`, `llms.txt`, sitemap, and existing For AI links; it creates no bulk catalogue endpoint and exposes no Saved or Board data.
 
 Approved outputs include or may include:
 

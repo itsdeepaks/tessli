@@ -42,11 +42,11 @@ Authentication, cloud workspaces, submissions, moderation, large pattern catalog
 
 ## Active V3 execution loop
 
-V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, V3.8 local MCP v2, and V3.9 compact public machine representations are complete. The next independently reviewable slice is **V3.10 — Machine discovery**.
+V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, V3.8 local MCP v2, V3.9 compact public machine representations, and V3.10 machine discovery are complete. The next independently reviewable slice is **V3.11 — Collections as research paths**.
 
 ```text
-V3.10 Machine discovery
-→ V3.11 Collections as research paths
+V3.11 Collections as research paths
+→ V3.12 Saved-to-Board flow
 ```
 
 Machine work follows the stable source-guide contract:
@@ -55,7 +55,7 @@ Machine work follows the stable source-guide contract:
 V3.7 deterministic task retrieval
 → V3.8 local MCP v2
 → V3.9 compact public representations
-→ V3.10 machine discovery
+→ V3.10 machine discovery (complete)
 → V3.16 remote MCP
 → V3.17 supported cross-model validation
 ```
