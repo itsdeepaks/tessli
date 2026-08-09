@@ -26,16 +26,16 @@ test("canonical Browse derives one paginated result set from source profiles", a
     page,
     /redirect\(withState\(state, \{ page: result\.page \}\)\)/,
   );
-  assert.match(browse, /state\.view === "cards" \? 24 : 50/);
+  assert.match(browse, /const pageSize = 24;/);
   assert.match(browse, /filtered\.slice\(start, start \+ pageSize\)/);
   assert.match(page, /<BrowseFilters/);
   assert.match(filters, /data-browse-filter-sheet/);
   assert.match(filters, /aria-expanded=\{isOpen\}/);
-  assert.match(filters, /browseHref\(\{ \.\.\.defaultBrowseState/);
+  assert.match(filters, /browseHref\(\{[\s\S]*?\.\.\.defaultBrowseState/);
   assert.match(filters, /allLabel="All categories"/);
   assert.match(filters, /allLabel="All access models"/);
   assert.match(filters, /allLabel="All source types"/);
-  assert.match(filters, /allLabel="All coverage levels"/);
+  assert.doesNotMatch(filters, /All coverage levels|profileLevel/);
   assert.match(filters, /<option value="">\{allLabel\}<\/option>/);
   assert.doesNotMatch(page, /FullReferenceExperience|fetch\(/);
 });
@@ -50,7 +50,7 @@ test("reference support does not promote unready submission actions", async () =
   assert.match(reference, /Read correction guidance/u);
 });
 
-test("Browse state is allowlisted, serializable, and rejects fake verification sorting", async () => {
+test("Browse state is task-focused, serializable, and rejects fake verification sorting", async () => {
   const browse = await read("lib/browse.ts");
 
   for (const field of [
@@ -58,9 +58,7 @@ test("Browse state is allowlisted, serializable, and rejects fake verification s
     "category",
     "access",
     "sourceType",
-    "profileLevel",
     "sort",
-    "view",
     "page",
   ]) {
     assert.match(browse, new RegExp(`"${field}"`));
@@ -79,23 +77,15 @@ test("Browse state is allowlisted, serializable, and rejects fake verification s
   assert.match(browse, /slice\(0, 160\)/);
 });
 
-test("cards, list, and table expose internal profiles plus independent save and provider actions", async () => {
+test("Browse cards expose internal profiles plus independent save and provider actions", async () => {
   const results = await read("components/browse/browse-results.tsx");
 
-  assert.match(results, /if \(view === "cards"\)/);
-  assert.match(results, /if \(view === "table"\)/);
   assert.match(results, /data-browse-view="cards"/);
-  assert.match(results, /data-browse-view="table"/);
-  assert.match(results, /data-browse-view="list"/);
   assert.match(results, /<ResourceCard/);
-  assert.match(results, /href=\{`\/resources\/\$\{profile\.slug\}`\}/);
-  assert.match(results, /Visit source ↗/);
-  assert.match(results, /target="_blank"/);
-  assert.match(results, /rel="noopener noreferrer"/);
-  assert.match(results, /aria-pressed=\{savedIds\.includes\(card\.id\)\}/);
+  assert.match(results, /profileHref=\{`\/resources\/\$\{profile\.slug\}`\}/);
+  assert.match(results, /onSavedChange=\{handleSavedChange\}/);
   assert.match(results, /aria-live="polite"/);
-  assert.match(results, /<table className=\{styles\.table\}>/);
-  assert.match(results, /<caption className=\{styles\.srOnly\}>/);
+  assert.doesNotMatch(results, /table|compactList|profileLevel/);
   assert.doesNotMatch(results, /fetch\(|sessionStorage/);
   assert.doesNotMatch(
     results,
@@ -120,9 +110,8 @@ test("canonical Browse renders one responsive result tree without duplicate desk
   assert.match(css, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(css, /@media \(max-width: 700px\)/);
   assert.match(css, /grid-template-columns:\s*minmax\(0, 1fr\)/);
-  assert.match(css, /overflow-x:\s*auto/);
   assert.match(css, /\.filterFieldsOpen\s*\{/);
-  assert.match(css, /\.table tbody\s*\{[\s\S]*?display:\s*grid/);
+  assert.doesNotMatch(css, /\.table|\.compactList|\.viewLinks/);
 });
 
 test("minimum source profile routes cover all source slugs without overstating enrichment", async () => {

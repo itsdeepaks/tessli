@@ -100,7 +100,7 @@ jobs:
 
           curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 1 \
             http://127.0.0.1:3000/resources > /tmp/tessli-resources.html
-          grep -q "Browse design sources" /tmp/tessli-resources.html
+          grep -q "What are you trying to design?" /tmp/tessli-resources.html
           grep -q 'data-browse-view="cards"' /tmp/tessli-resources.html
           grep -q "Inspect Tessli profile" /tmp/tessli-resources.html
 
