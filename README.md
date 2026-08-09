@@ -42,11 +42,11 @@ Authentication, cloud workspaces, submissions, moderation, large pattern catalog
 
 ## Active V3 execution loop
 
-V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, and V3.6 resource-card consistency are complete. The next independently reviewable slice is **V3.7 — Deterministic task retrieval**.
+V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, and V3.7 deterministic task retrieval are complete. The next independently reviewable slice is **V3.8 — Local MCP v2**.
 
 ```text
-V3.7 Deterministic task retrieval
-→ V3.8 Local MCP v2
+V3.8 Local MCP v2
+→ V3.9 Public machine representations v2
 ```
 
 Machine work follows the stable source-guide contract:
