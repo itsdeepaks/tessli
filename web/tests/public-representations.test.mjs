@@ -345,6 +345,7 @@ test("Collection v2 preserves ordered staged inspection and decision guidance", 
   });
   const markdown = serializePublicCollectionMarkdown(document);
   assert.match(markdown, /# Tessli Collection — Landing-page direction/u);
+  assert.match(markdown, /## Use this research path/u);
   assert.match(markdown, /## Staged decisions/u);
   assert.match(markdown, /\*\*Inspect:\*\* Inspect hierarchy/u);
   assert.match(markdown, /\*\*Decide:\*\* Choose the direction/u);

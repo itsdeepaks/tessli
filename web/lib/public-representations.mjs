@@ -323,6 +323,8 @@ export function serializePublicCollectionMarkdown(document) {
   const lines = [
     `# Tessli Collection — ${inline(collection.title)}`,
     "",
+    "## Use this research path",
+    "",
     `Use this research path to ${inline(collection.outcome)}`,
     "",
     inline(collection.description),
