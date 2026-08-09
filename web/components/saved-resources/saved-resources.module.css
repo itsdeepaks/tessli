@@ -194,6 +194,18 @@
   z-index: 1;
 }
 
+.boardAction {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--line-subtle);
+  background: var(--surface);
+  padding: var(--space-2) var(--space-5) var(--space-4);
+}
+
+.boardAction button {
+  width: 100%;
+}
+
 .emptyState,
 .filteredEmpty {
   display: grid;

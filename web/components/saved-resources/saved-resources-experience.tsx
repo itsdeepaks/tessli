@@ -11,6 +11,7 @@ import {
   ToastNotification,
   type ToastMessage,
 } from "@/components/toast-notification/toast-notification";
+import { BoardIntake } from "@/components/board-intake/board-intake";
 import {
   readSavedResourceIds,
   savedResourceStoreKey,
@@ -267,8 +268,8 @@ export function SavedResourcesExperience({
             <p className={styles.eyebrow}>Private browser workspace</p>
             <h1 id="saved-resources-title">Saved resources</h1>
             <p className={styles.summary}>
-              Search and refine the references kept in this browser. Tessli does
-              not create an account or sync them anywhere.
+              Search and refine the references kept in this browser. Boards stay
+              in this browser and are not uploaded or synced.
             </p>
           </div>
 
@@ -404,6 +405,9 @@ export function SavedResourcesExperience({
                       resource={resource}
                       saved
                     />
+                    <div className={styles.boardAction}>
+                      <BoardIntake resource={resource} />
+                    </div>
                   </li>
                 ))}
               </ul>
