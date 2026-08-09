@@ -87,24 +87,99 @@ const machineRouteChecks = [
   {
     path: "/resources/designindex/profile.json",
     contentType: "application/json",
-    expectedText: '"contract": "tessli.public-source.v1"',
+    contract: "tessli.public-source.v2",
+    kind: "source",
   },
   {
     path: "/resources/designindex/profile.md",
     contentType: "text/markdown",
-    expectedText: "# Tessli Source Profile — DesignIndex",
+    headings: [
+      "# Tessli Source Guide — DesignIndex",
+      "## Use it when",
+      "## What to explore",
+      "## How to access",
+      "## Important limitations",
+      "## Consider instead",
+    ],
+    kind: "source",
   },
   {
     path: "/collections/saas-landing-pages/collection.json",
     contentType: "application/json",
-    expectedText: '"contract": "tessli.public-playbook.v2"',
+    contract: "tessli.public-collection.v2",
+    kind: "collection",
   },
   {
     path: "/collections/saas-landing-pages/collection.md",
     contentType: "text/markdown",
-    expectedText: "# Tessli Playbook — SaaS landing-page references",
+    headings: [
+      "# Tessli Collection — SaaS landing-page references",
+      "## Use this research path",
+      "## Staged decisions",
+    ],
+    kind: "collection",
   },
 ];
+
+function assertSourcePacket(packet, path) {
+  assert.equal(packet.contract, "tessli.public-source.v2", `${path} contract`);
+  assert.equal(typeof packet.source?.purpose, "string", `${path} purpose`);
+  assert.ok(packet.source.purpose.length > 0, `${path} purpose copy`);
+  for (const field of [
+    "useWhen",
+    "whatToExplore",
+    "accessRoutes",
+    "importantLimitations",
+    "alternatives",
+  ]) {
+    assert.ok(Array.isArray(packet.source?.[field]), `${path} ${field}`);
+  }
+  assert.ok(
+    packet.source.accessRoutes.every(
+      (route) => typeof route.agentAction === "string" && route.agentAction,
+    ),
+    `${path} access actions`,
+  );
+  assert.ok(packet.source.alternatives.length <= 2, `${path} alternatives cap`);
+  assert.ok(
+    packet.source.alternatives.every(
+      (alternative) =>
+        typeof alternative.canonicalPath === "string" &&
+        typeof alternative.differentiator === "string",
+    ),
+    `${path} differentiated alternatives`,
+  );
+}
+
+function assertCollectionPacket(packet, path) {
+  assert.equal(
+    packet.contract,
+    "tessli.public-collection.v2",
+    `${path} contract`,
+  );
+  assert.equal(typeof packet.collection?.outcome, "string", `${path} outcome`);
+  assert.ok(Array.isArray(packet.collection?.stages), `${path} stages`);
+  assert.equal(
+    packet.collection.stages.length,
+    packet.collection.stageCount,
+    `${path} stage count`,
+  );
+  assert.ok(
+    packet.collection.stages.every(
+      (stage, index) =>
+        stage.order === index + 1 &&
+        Array.isArray(stage.resources) &&
+        stage.resources.every(
+          (resource) =>
+            typeof resource.role === "string" &&
+            typeof resource.inspectPrompt === "string" &&
+            typeof resource.decisionPrompt === "string" &&
+            typeof resource.sourceGuide?.canonicalPath === "string",
+        ),
+    ),
+    `${path} staged action guidance`,
+  );
+}
 
 for (const check of machineRouteChecks) {
   const response = await fetch(`${origin}${check.path}`);
@@ -130,7 +205,53 @@ for (const check of machineRouteChecks) {
     /rel="canonical"/u,
     `${check.path} canonical link`,
   );
-  assert.match(body, new RegExp(check.expectedText, "i"), `${check.path} body`);
+  if (check.contract) {
+    const packet = JSON.parse(body);
+    if (check.kind === "source") assertSourcePacket(packet, check.path);
+    else assertCollectionPacket(packet, check.path);
+  } else {
+    for (const heading of check.headings) {
+      assert.match(body, new RegExp(heading, "i"), `${check.path} ${heading}`);
+    }
+  }
+
+  const headResponse = await fetch(`${origin}${check.path}`, {
+    method: "HEAD",
+  });
+  assert.equal(headResponse.status, 200, `${check.path} HEAD status`);
+  assert.equal(
+    await headResponse.text(),
+    "",
+    `${check.path} HEAD body is empty`,
+  );
+  assert.equal(
+    headResponse.headers.get("access-control-allow-origin"),
+    "*",
+    `${check.path} HEAD CORS`,
+  );
+
+  const optionsResponse = await fetch(`${origin}${check.path}`, {
+    method: "OPTIONS",
+  });
+  assert.equal(optionsResponse.status, 204, `${check.path} OPTIONS status`);
+  assert.equal(
+    optionsResponse.headers.get("allow"),
+    "GET, HEAD, OPTIONS",
+    `${check.path} OPTIONS methods`,
+  );
+  assert.equal(
+    optionsResponse.headers.get("access-control-allow-origin"),
+    "*",
+    `${check.path} OPTIONS CORS`,
+  );
+}
+
+for (const path of [
+  "/resources/not-a-real-source/profile.json",
+  "/collections/not-a-real-collection/collection.json",
+]) {
+  const response = await fetch(`${origin}${path}`);
+  assert.equal(response.status, 404, `${path} remains not found`);
 }
 
 const visualCases = [

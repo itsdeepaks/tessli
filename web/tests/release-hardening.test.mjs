@@ -224,7 +224,7 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.9 Public machine representations v2 NEXT\*\*/,
+    /Status: \*\*active delivery plan — V3\.10 Machine discovery NEXT\*\*/,
   );
   assert.match(
     slices,
@@ -255,8 +255,9 @@ test("release history remains preserved while V3 drives active execution", async
   assert.match(slices, tableRow("V3.8", "Local MCP v2", "DONE", "V3.7"));
   assert.match(
     slices,
-    tableRow("V3.9", "Public machine representations v2", "NEXT", "V3.7"),
+    tableRow("V3.9", "Public machine representations v2", "DONE", "V3.7"),
   );
+  assert.match(slices, tableRow("V3.10", "Machine discovery", "NEXT", "V3.9"));
   assert.match(slices, /## 7\. Historical V2 phase status/);
   assert.match(
     plan,
@@ -332,16 +333,16 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.9 Public machine representations v2\*\*/,
+    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.10 Machine discovery\*\*/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
   assert.match(
     readme,
-    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, and V3\.8 local MCP v2 are complete\./,
+    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, and V3\.9 compact public machine representations are complete\./,
   );
   assert.match(
     readme,
-    /next independently reviewable slice is \*\*V3\.9 — Public machine representations v2\*\*/i,
+    /next independently reviewable slice is \*\*V3\.10 — Machine discovery\*\*/i,
   );
   assert.match(
     slices,

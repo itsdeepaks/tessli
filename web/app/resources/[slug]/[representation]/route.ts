@@ -5,6 +5,7 @@ import {
   serializePublicJson,
   serializePublicSourceMarkdown,
 } from "@/lib/public-representations.mjs";
+import { getSimilarSourceProfiles } from "@/lib/similar-sources";
 import { getAllSourceProfiles, getSourceProfile } from "@/lib/source-profiles";
 
 export const dynamic = "force-static";
@@ -57,7 +58,10 @@ async function buildResponse({ params }: RouteProps, head = false) {
   }
   const profile = getSourceProfile(slug);
   if (!profile) return notFoundResponse(representation);
-  const document = createPublicSourceRepresentation(profile);
+  const document = createPublicSourceRepresentation(
+    profile,
+    getSimilarSourceProfiles(profile, 2),
+  );
   const format = representation.endsWith(".json") ? "json" : "markdown";
   const body =
     format === "json"
