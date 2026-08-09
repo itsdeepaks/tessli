@@ -49,7 +49,7 @@ const viewports = [
 
 const routeChecks = [
   ["/", 200, "Find better design resources, faster"],
-  ["/collections", 200, "Six staged collections"],
+  ["/collections", 200, "Guided research paths"],
   ["/collections/saas-landing-pages", 200, "SaaS landing-page references"],
   ["/collections/typography-font-tools", 200, "Typography and font tools"],
   ["/collections/motion-starter-pack", 200, "Motion starter pack"],

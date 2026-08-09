@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import {
-  formatCollectionReviewDate,
   type CollectionCoverStyle,
   type PublishedCollection,
 } from "@/lib/collections";
@@ -12,13 +11,12 @@ export type CollectionCardVariant = "featured" | "compact";
 
 type CollectionCardProps = Readonly<{
   collection: PublishedCollection;
-  variant: CollectionCardVariant;
+  variant?: CollectionCardVariant;
 }>;
 
 type CollectionCoverProps = Readonly<{
   style: CollectionCoverStyle;
   title: string;
-  compact?: boolean;
 }>;
 
 function ArrowIcon() {
@@ -38,17 +36,12 @@ function initials(title: string) {
     .join("");
 }
 
-export function CollectionCover({
-  style,
-  title,
-  compact = false,
-}: CollectionCoverProps) {
+export function CollectionCover({ style, title }: CollectionCoverProps) {
   return (
     <div
       aria-hidden="true"
       className={styles.cover}
       data-collection-cover-style={style}
-      data-collection-cover-size={compact ? "compact" : "featured"}
     >
       <span className={styles.coverIndex}>{initials(title)}</span>
       <span className={styles.coverLine} />
@@ -59,43 +52,50 @@ export function CollectionCover({
 }
 
 export function CollectionCard({ collection, variant }: CollectionCardProps) {
-  const titleId = `collection-${collection.slug}-title`;
-  const descriptionId = `collection-${collection.slug}-description`;
+  const expectedDecision =
+    collection.stages[collection.stages.length - 1]?.decision;
 
   return (
     <article
       className={styles.card}
       data-collection-card
       data-collection-slug={collection.slug}
+      data-collection-stage-count={collection.stages.length}
       data-collection-variant={variant}
-      data-playbook-stage-count={collection.stages.length}
     >
-      <Link
-        aria-describedby={descriptionId}
-        aria-labelledby={titleId}
-        className={styles.link}
-        href={`/collections/${collection.slug}`}
-      >
+      <Link className={styles.link} href={`/collections/${collection.slug}`}>
         <CollectionCover
-          compact={variant === "compact"}
           style={collection.coverStyle}
           title={collection.title}
         />
         <div className={styles.body}>
           <div className={styles.headingRow}>
-            <div>
-              <p className={styles.meta}>
-                {collection.stages.length} stages ·{" "}
-                {collection.resources.length} sources · Reviewed{" "}
-                {formatCollectionReviewDate(collection.lastReviewedAt)}
-              </p>
-              <h2 id={titleId}>{collection.title}</h2>
-            </div>
+            <h3>{collection.title}</h3>
             <ArrowIcon />
           </div>
-          <p className={styles.description} id={descriptionId}>
-            {collection.outcome}
-          </p>
+
+          <dl className={styles.facts}>
+            <div>
+              <dt>Goal</dt>
+              <dd>{collection.description}</dd>
+            </div>
+            <div>
+              <dt>Outcome</dt>
+              <dd>{collection.outcome}</dd>
+            </div>
+            <div>
+              <dt>Audience</dt>
+              <dd>{collection.audience}</dd>
+            </div>
+            <div>
+              <dt>Stages</dt>
+              <dd>{collection.stages.length}</dd>
+            </div>
+            <div className={styles.decision}>
+              <dt>Expected decision</dt>
+              <dd>{expectedDecision}</dd>
+            </div>
+          </dl>
         </div>
       </Link>
     </article>

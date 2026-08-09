@@ -18,17 +18,10 @@
 
 .link {
   display: grid;
+  min-height: 44px;
   height: 100%;
   color: inherit;
   text-decoration: none;
-}
-
-.card[data-collection-variant="featured"] .link {
-  grid-template-columns: minmax(220px, 0.92fr) minmax(0, 1.08fr);
-}
-
-.card[data-collection-variant="compact"] .link {
-  grid-template-rows: auto 1fr;
 }
 
 .link:focus-visible {
@@ -38,16 +31,10 @@
 
 .cover {
   position: relative;
+  min-height: 150px;
   overflow: hidden;
-  min-height: 220px;
-  border-right: 1px solid var(--line-subtle);
-  background: var(--surface-muted);
-}
-
-.cover[data-collection-cover-size="compact"] {
-  min-height: 164px;
-  border-right: 0;
   border-bottom: 1px solid var(--line-subtle);
+  background: var(--surface-muted);
 }
 
 .cover::before,
@@ -108,11 +95,11 @@
 .coverIndex {
   position: absolute;
   z-index: 2;
-  top: 34px;
-  left: 34px;
+  top: 28px;
+  left: 28px;
   color: var(--text-strong);
   font-family: var(--font-newsreader), Georgia, serif;
-  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-size: clamp(3.25rem, 6vw, 5rem);
   font-weight: 620;
   letter-spacing: -0.06em;
   line-height: 0.84;
@@ -120,8 +107,8 @@
 
 .coverLine {
   position: absolute;
-  right: 34px;
-  bottom: 42px;
+  right: 30px;
+  bottom: 30px;
   width: min(46%, 130px);
   height: 10px;
   background: var(--accent);
@@ -130,9 +117,9 @@
 
 .coverShape {
   position: absolute;
-  right: 36px;
-  bottom: 70px;
-  width: 74px;
+  right: 32px;
+  bottom: 52px;
+  width: 64px;
   aspect-ratio: 1;
   border: 1px solid var(--line-strong);
   transform: rotate(18deg);
@@ -140,9 +127,9 @@
 
 .coverDot {
   position: absolute;
-  right: 84px;
-  bottom: 94px;
-  width: 18px;
+  right: 72px;
+  bottom: 72px;
+  width: 16px;
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--text-strong);
@@ -152,10 +139,6 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  padding: clamp(24px, 3vw, 36px);
-}
-
-.card[data-collection-variant="compact"] .body {
   padding: var(--space-5);
 }
 
@@ -167,10 +150,19 @@
   gap: var(--space-4);
 }
 
+.headingRow h3 {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: var(--text-h3);
+  font-weight: 610;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+
 .headingRow svg {
   width: 22px;
   height: 22px;
-  margin-top: 24px;
   color: var(--text-muted);
   stroke: currentColor;
   stroke-linecap: round;
@@ -187,70 +179,48 @@
   transform: translateX(3px);
 }
 
-.meta {
-  margin: 0;
+.facts {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+}
+
+.facts > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.facts dt {
   color: var(--text-muted);
   font-size: var(--text-micro);
-  font-weight: 650;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.headingRow h2 {
-  margin: var(--space-2) 0 0;
-  color: var(--text-strong);
-  font-family: var(--font-newsreader), Georgia, serif;
-  font-size: clamp(1.65rem, 3vw, 2.35rem);
-  font-weight: 610;
-  letter-spacing: -0.025em;
-  line-height: 1.02;
-}
-
-.card[data-collection-variant="compact"] .headingRow h2 {
-  font-size: var(--text-h3);
-  line-height: 1.14;
-}
-
-.description {
-  display: -webkit-box;
-  overflow: hidden;
-  margin: var(--space-4) 0 0;
+.facts dd {
+  margin: 0;
   color: var(--text-body);
   font-size: var(--text-body-sm);
-  line-height: 1.55;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+  line-height: 1.5;
 }
 
-.card[data-collection-variant="compact"] .description {
-  -webkit-line-clamp: 3;
+.facts .decision {
+  border-top: 1px solid var(--line-subtle);
+  padding-top: var(--space-3);
 }
 
-@media (max-width: 860px) {
-  .card[data-collection-variant="featured"] .link {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-
-  .cover {
-    min-height: 184px;
-    border-right: 0;
-    border-bottom: 1px solid var(--line-subtle);
-  }
+.facts .decision dd {
+  color: var(--text-strong);
+  font-weight: 600;
 }
 
 @media (max-width: 480px) {
-  .cover,
-  .cover[data-collection-cover-size="compact"] {
-    min-height: 150px;
+  .cover {
+    min-height: 140px;
   }
 
-  .coverIndex {
-    top: 28px;
-    left: 28px;
-  }
-
-  .body,
-  .card[data-collection-variant="compact"] .body {
+  .body {
     padding: var(--space-4);
   }
 }
@@ -263,6 +233,12 @@
 }
 
 @media (forced-colors: active) {
+  .card,
+  .cover,
+  .facts .decision {
+    border-color: CanvasText;
+  }
+
   .cover::before,
   .coverShape {
     border-color: CanvasText;

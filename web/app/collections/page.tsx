@@ -6,79 +6,46 @@ import styles from "./collections.module.css";
 export const metadata = {
   title: "Collections",
   description:
-    "Explore six staged Tessli collections, each a guided research playbook for practical design and frontend decisions.",
+    "Guided Tessli research paths for practical design and frontend decisions.",
 };
 
 export default function CollectionsPage() {
-  const playbooks = getPublishedCollections();
-  const membershipCount = playbooks.reduce(
-    (sum, playbook) => sum + playbook.resources.length,
-    0,
-  );
-  const stageCount = playbooks.reduce(
-    (sum, playbook) => sum + playbook.stages.length,
-    0,
-  );
+  const collections = getPublishedCollections();
 
   return (
     <main className={styles.page} id="main-content">
       <div className="tessli-container">
         <header className={styles.hero}>
-          <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>Guided research playbooks</p>
-            <h1>Move from source discovery to a defensible decision.</h1>
-            <p className={styles.lede}>
-              Each collection turns a reviewed source set into an ordered
-              research path. Follow the stages, inspect the stated evidence, and
-              record the decision each source helps you make.
-            </p>
-          </div>
-          <dl className={styles.facts} aria-label="Collection catalogue facts">
-            <div>
-              <dt>Published collections</dt>
-              <dd>{playbooks.length}</dd>
-            </div>
-            <div>
-              <dt>Research stages</dt>
-              <dd>{stageCount}</dd>
-            </div>
-            <div>
-              <dt>Ordered source roles</dt>
-              <dd>{membershipCount}</dd>
-            </div>
-          </dl>
+          <p className={styles.eyebrow}>Collections</p>
+          <h1>Which guided research path matches my goal?</h1>
+          <p className={styles.lede}>
+            Choose a focused path, then work through its stages to make the next
+            design or frontend decision with useful context.
+          </p>
         </header>
 
         <section className={styles.section} aria-labelledby="collections-title">
           <div className={styles.sectionHeading}>
-            <div>
-              <p className={styles.eyebrow}>Repository maintained</p>
-              <h2 id="collections-title">Six staged collections</h2>
-            </div>
+            <h2 id="collections-title">Guided research paths</h2>
             <p>
-              The sequence is editorial guidance, not a ranking. Recheck each
-              provider&apos;s current access, licensing, and terms before use.
+              Each path makes its goal, audience, and intended decision clear.
             </p>
           </div>
 
-          <ul className={styles.grid} data-collections-grid data-playbooks-grid>
-            {playbooks.map((playbook, index) => {
-              const variant = index < 2 ? "featured" : "compact";
-
-              return (
-                <li
-                  className={
-                    variant === "featured"
-                      ? styles.featuredItem
-                      : styles.compactItem
-                  }
-                  key={playbook.id}
-                >
-                  <CollectionCard collection={playbook} variant={variant} />
+          {collections.length > 0 ? (
+            <ul className={styles.grid} data-collections-grid>
+              {collections.map((collection) => (
+                <li key={collection.id}>
+                  <CollectionCard collection={collection} />
                 </li>
-              );
-            })}
-          </ul>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.empty} role="status">
+              No guided research paths are published yet. Browse Tessli sources
+              to begin your research.
+            </p>
+          )}
         </section>
       </div>
     </main>

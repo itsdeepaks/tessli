@@ -224,7 +224,7 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.11 Collections as research paths NEXT\*\*/,
+    /Status: \*\*active delivery plan — V3\.12 Saved-to-Board flow NEXT\*\*/,
   );
   assert.match(
     slices,
@@ -260,7 +260,11 @@ test("release history remains preserved while V3 drives active execution", async
   assert.match(slices, tableRow("V3.10", "Machine discovery", "DONE", "V3.9"));
   assert.match(
     slices,
-    tableRow("V3.11", "Collections as research paths", "NEXT", "V3.3, V3.6"),
+    tableRow("V3.11", "Collections as research paths", "DONE", "V3.3, V3.6"),
+  );
+  assert.match(
+    slices,
+    tableRow("V3.12", "Saved-to-Board flow", "NEXT", "V3.3, V3.6"),
   );
   assert.match(slices, /## 7\. Historical V2 phase status/);
   assert.match(
@@ -337,16 +341,16 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.11 Collections as research paths\*\*/,
+    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.12 Saved-to-Board flow\*\*/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
   assert.match(
     readme,
-    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, V3\.9 compact public machine representations, and V3\.10 machine discovery are complete\./,
+    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, V3\.9 compact public machine representations, V3\.10 machine discovery, and V3\.11 Collections as research paths are complete\./,
   );
   assert.match(
     readme,
-    /next independently reviewable slice is \*\*V3\.11 — Collections as research paths\*\*/i,
+    /next independently reviewable slice is \*\*V3\.12 — Saved-to-Board flow\*\*/i,
   );
   assert.match(
     slices,

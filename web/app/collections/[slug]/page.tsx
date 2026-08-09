@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { CollectionCover } from "@/components/collection-card/collection-card";
 import { CollectionResourceList } from "@/components/collection-resources/collection-resource-list";
 import {
-  formatCollectionReviewDate,
   getPublishedCollection,
   getPublishedCollections,
 } from "@/lib/collections";
@@ -54,7 +53,6 @@ export default async function CollectionDetailPage({
     <main
       className={styles.page}
       data-collection-detail={playbook.slug}
-      data-collection-resource-count={playbook.resources.length}
       data-playbook-stage-count={playbook.stages.length}
       id="main-content"
     >
@@ -73,61 +71,37 @@ export default async function CollectionDetailPage({
             />
           </div>
           <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>Research Playbook</p>
+            <p className={styles.eyebrow}>Guided research path</p>
             <h1>{playbook.title}</h1>
-            <p className={styles.description}>{playbook.description}</p>
             <div className={styles.intentGrid}>
-              <section aria-labelledby="outcome-title">
-                <p className={styles.intentLabel} id="outcome-title">
-                  Outcome
+              <section aria-labelledby="goal-title">
+                <p className={styles.intentLabel} id="goal-title">
+                  Goal
                 </p>
-                <p>{playbook.outcome}</p>
+                <p>{playbook.description}</p>
               </section>
               <section aria-labelledby="audience-title">
                 <p className={styles.intentLabel} id="audience-title">
-                  For
+                  Audience
                 </p>
                 <p>{playbook.audience}</p>
               </section>
+              <section aria-labelledby="decision-title">
+                <p className={styles.intentLabel} id="decision-title">
+                  Expected decision
+                </p>
+                <p>{playbook.outcome}</p>
+              </section>
             </div>
-            <dl className={styles.facts}>
-              <div>
-                <dt>Stages</dt>
-                <dd>{playbook.stages.length}</dd>
-              </div>
-              <div>
-                <dt>Sources</dt>
-                <dd>{playbook.resources.length}</dd>
-              </div>
-              <div>
-                <dt>Last reviewed</dt>
-                <dd>
-                  <time dateTime={playbook.lastReviewedAt}>
-                    {formatCollectionReviewDate(playbook.lastReviewedAt)}
-                  </time>
-                </dd>
-              </div>
-            </dl>
             <div className={styles.actions}>
               <Link className={styles.primaryAction} href="/boards">
-                Open project Boards
+                Continue in Boards
               </Link>
-              <Link className={styles.secondaryAction} href="/collections">
-                Browse all Collections
-              </Link>
-              <a
-                className={styles.secondaryAction}
-                href={`/collections/${playbook.slug}/collection.md`}
-              >
-                Markdown
-              </a>
-              <a
-                className={styles.secondaryAction}
-                href={`/collections/${playbook.slug}/collection.json`}
-              >
-                JSON
-              </a>
             </div>
+            <p className={styles.boardNote}>
+              Save sources here, then use Boards to record the choices you want
+              to carry into your project.
+            </p>
           </div>
         </header>
 
@@ -135,11 +109,11 @@ export default async function CollectionDetailPage({
           <header className={styles.resourcesHeading}>
             <div>
               <p className={styles.eyebrow}>Ordered research sequence</p>
-              <h2 id="stages-title">Work through the stages</h2>
+              <h2 id="stages-title">Inspect one stage at a time</h2>
             </div>
             <p>
-              Save useful sources as you inspect them, then move the evidence
-              into a project Board. The sequence is guidance, not a ranking.
+              Start with the first stage, inspect each source against its
+              prompt, and save the references that help you make the decision.
             </p>
           </header>
 
@@ -169,6 +143,8 @@ export default async function CollectionDetailPage({
 
                 <CollectionResourceList
                   className={styles.grid}
+                  decisionPrompt={stage.decision}
+                  inspectPrompt={stage.inspect}
                   resources={stage.resources}
                 />
               </article>
@@ -176,14 +152,12 @@ export default async function CollectionDetailPage({
           </div>
         </section>
 
-        <aside className={styles.improvement}>
+        <aside aria-label="Machine access" className={styles.machineAccess}>
+          <p>Machine access</p>
           <div>
-            <p className={styles.eyebrow}>Repository maintained</p>
-            <h2>Found a missing source or weak stage?</h2>
+            <a href={`/collections/${playbook.slug}/collection.json`}>JSON</a>
+            <a href={`/collections/${playbook.slug}/collection.md`}>Markdown</a>
           </div>
-          <Link className={styles.secondaryAction} href="/curation#corrections">
-            Read the correction process
-          </Link>
         </aside>
       </div>
     </main>
