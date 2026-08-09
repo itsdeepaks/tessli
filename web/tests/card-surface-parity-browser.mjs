@@ -140,9 +140,7 @@ async function assertCardActions(surface) {
     const inspect = links.find(
       (link) => link.getAttribute("href") === ${JSON.stringify(profilePath)},
     );
-    const visit = links.find(
-      (link) => link.getAttribute("href") === ${JSON.stringify(resource.url)},
-    );
+    const visit = card?.querySelector("[data-resource-visit]");
 
     return {
       inspect: inspect
