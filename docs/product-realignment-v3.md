@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.11 — Collections as research paths**
+Next implementation slice: **V3.12 — Saved-to-Board flow**
 
 ## 1. Product definition
 
@@ -432,4 +432,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.11 Collections as research paths**. It turns existing Collection pages into clearer guided research checklists that flow naturally into local Boards.
+Start **V3.12 Saved-to-Board flow**. It turns a saved shortlist into deliberate local Board decisions without requiring an account.

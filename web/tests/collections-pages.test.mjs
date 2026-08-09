@@ -24,34 +24,37 @@ test("Playbook adapter resolves staged roles from canonical catalogue data", asy
   assert.doesNotMatch(adapter, /fetch\(|Date\.now\(|Math\.random/);
 });
 
-test("Collections index uses staged workflow framing and repository facts", async () => {
+test("Collections index uses research-path framing and canonical collections", async () => {
   const page = await read("app/collections/page.tsx");
 
   assert.match(page, /title: "Collections"/);
-  assert.match(page, /Guided research playbooks/);
-  assert.match(page, /Published collections/);
-  assert.match(page, /Six staged collections/);
-  assert.match(page, /Move from source discovery to a defensible decision/);
-  assert.match(page, /playbook\.stages\.length/);
-  assert.match(page, /data-playbooks-grid/);
-  assert.match(page, /<CollectionCard collection=\{playbook\}/);
-  assert.doesNotMatch(page, /Trending|Recent|popularity ranking|<input/i);
+  assert.match(page, /Which guided research path matches my goal\?/);
+  assert.match(page, /Guided research paths/);
+  assert.match(page, /collections\.map/);
+  assert.match(page, /data-collections-grid/);
+  assert.match(page, /<CollectionCard collection=\{collection\}/);
+  assert.doesNotMatch(
+    page,
+    /Trending|Recent|popularity ranking|reviewed|<input/i,
+  );
 });
 
-test("Playbook cards expose stages, source count, and outcome", async () => {
+test("Collection cards expose goal, audience, stages, and expected decision", async () => {
   const card = await read("components/collection-card/collection-card.tsx");
 
   assert.match(
     card,
-    /data-playbook-stage-count=\{collection\.stages\.length\}/,
+    /data-collection-stage-count=\{collection\.stages\.length\}/,
   );
   assert.match(card, /collection\.stages\.length/);
-  assert.match(card, /collection\.resources\.length/);
+  assert.match(card, /collection\.description/);
   assert.match(card, /collection\.outcome/);
+  assert.match(card, /collection\.audience/);
+  assert.match(card, /Expected decision/);
   assert.match(card, /href=\{`\/collections\/\$\{collection\.slug\}`\}/);
   assert.doesNotMatch(
     card,
-    /button|onClick|curator|avatar|trending\b|popular\b/i,
+    /button|onClick|curator|avatar|trending\b|popular\b|reviewed/i,
   );
 });
 
@@ -88,7 +91,7 @@ test("Playbook detail exposes intent, stages, roles, Board, and exports", async 
   assert.match(resourceCard, /rel="noopener noreferrer"/);
 });
 
-test("Playbook layouts use bounded staged grids and responsive collapse", async () => {
+test("Collection layouts use bounded grids and responsive collapse", async () => {
   const [cardCss, indexCss, detailCss, resourceCss] = await Promise.all([
     read("components/collection-card/collection-card.module.css"),
     read("app/collections/collections.module.css"),
@@ -96,7 +99,11 @@ test("Playbook layouts use bounded staged grids and responsive collapse", async 
     read("components/collection-resources/collection-resource-list.module.css"),
   ]);
 
-  assert.match(cardCss, /data-collection-variant="featured"/);
+  assert.match(cardCss, /min-height: 44px/);
+  assert.match(
+    indexCss,
+    /grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/,
+  );
   assert.match(
     indexCss,
     /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/,

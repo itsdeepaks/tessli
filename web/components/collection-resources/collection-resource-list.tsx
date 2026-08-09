@@ -24,11 +24,15 @@ type CollectionResource = Readonly<{
 type CollectionResourceListProps = Readonly<{
   resources: readonly CollectionResource[];
   className: string;
+  inspectPrompt: string;
+  decisionPrompt: string;
 }>;
 
 export function CollectionResourceList({
   resources,
   className,
+  inspectPrompt,
+  decisionPrompt,
 }: CollectionResourceListProps) {
   const cards = useMemo(
     () => resources.map((item) => item.resource),
@@ -83,10 +87,20 @@ export function CollectionResourceList({
       <ol className={className} data-collection-resource-grid>
         {resources.map(({ resource, categoryLabel, role }) => (
           <li data-playbook-resource-role key={resource.id}>
-            <p className={styles.role}>
-              <strong>Why included</strong>
-              <span>{role}</span>
-            </p>
+            <dl className={styles.role}>
+              <div>
+                <dt>Role — Why included</dt>
+                <dd>{role}</dd>
+              </div>
+              <div>
+                <dt>Inspect</dt>
+                <dd>{inspectPrompt}</dd>
+              </div>
+              <div>
+                <dt>Decision prompt</dt>
+                <dd>{decisionPrompt}</dd>
+              </div>
+            </dl>
             <ResourceCard
               categoryLabel={categoryLabel}
               onSavedChange={handleSavedChange}

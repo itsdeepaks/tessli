@@ -138,7 +138,7 @@ assert.equal(
 );
 assert.equal(
   await evaluate(
-    'document.querySelectorAll("[data-playbook-stage-count=\\"3\\"]").length',
+    'document.querySelectorAll("[data-collection-stage-count=\\"3\\"]").length',
   ),
   6,
 );
@@ -165,7 +165,7 @@ await evaluate('localStorage.removeItem("tessli-saved-resource-ids-v2")');
 for (const [index, slug] of collectionSlugs.entries()) {
   await navigate(
     `/collections/${slug}`,
-    `document.querySelector('[data-collection-detail="${slug}"]')?.getAttribute('data-collection-resource-count') === '10'`,
+    `document.querySelectorAll('[data-collection-detail="${slug}"] [data-collection-resource-grid] > li').length === 10`,
   );
 
   assert.equal(
@@ -261,4 +261,6 @@ await screenshot("playbook-detail-390x844.png");
 
 socket.close();
 assert.deepEqual(browserFailures, []);
-console.log("Playbooks index, stages, exports, and Save checks passed.");
+console.log(
+  "Collections research paths, stages, machine links, and Save checks passed.",
+);
