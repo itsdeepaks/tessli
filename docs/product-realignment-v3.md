@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.9 — Public machine representations v2**
+Next implementation slice: **V3.10 — Machine discovery**
 
 ## 1. Product definition
 
@@ -432,4 +432,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.9 Public machine representations v2**. It makes the same task-fit source guidance compact and actionable through canonical public JSON and Markdown.
+Start **V3.10 Machine discovery**. It advertises only the implemented public source and Collection representations through static discovery files and links.

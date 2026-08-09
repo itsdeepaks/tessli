@@ -42,11 +42,11 @@ Authentication, cloud workspaces, submissions, moderation, large pattern catalog
 
 ## Active V3 execution loop
 
-V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, and V3.8 local MCP v2 are complete. The next independently reviewable slice is **V3.9 — Public machine representations v2**.
+V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, V3.8 local MCP v2, and V3.9 compact public machine representations are complete. The next independently reviewable slice is **V3.10 — Machine discovery**.
 
 ```text
-V3.9 Public machine representations v2
-→ V3.10 Machine discovery
+V3.10 Machine discovery
+→ V3.11 Collections as research paths
 ```
 
 Machine work follows the stable source-guide contract:
@@ -88,7 +88,7 @@ All 295 sources must not imply equal intelligence depth.
 
 ### Without MCP
 
-Tessli supports stable semantic source pages, deterministic Board research packs, and public source/Collection Markdown and JSON that can be searched, shared, pasted, or uploaded to models. V3.9–V3.10 will make these compact, action-oriented, and discoverable.
+Tessli supports stable semantic source pages, deterministic Board research packs, and compact public source/Collection Markdown and JSON that can be searched, shared, pasted, or uploaded to models. V3.10 will make these supported interfaces discoverable.
 
 ### With MCP
 

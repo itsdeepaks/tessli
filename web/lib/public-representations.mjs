@@ -1,6 +1,6 @@
-export const PUBLIC_SOURCE_REPRESENTATION_CONTRACT = "tessli.public-source.v1";
+export const PUBLIC_SOURCE_REPRESENTATION_CONTRACT = "tessli.public-source.v2";
 export const PUBLIC_COLLECTION_REPRESENTATION_CONTRACT =
-  "tessli.public-playbook.v2";
+  "tessli.public-collection.v2";
 
 const CACHE_CONTROL =
   "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800";
@@ -29,7 +29,7 @@ function markdown(lines) {
 }
 
 function pushList(lines, title, values) {
-  lines.push(`### ${title}`, "");
+  lines.push(`## ${title}`, "");
   if (!Array.isArray(values) || values.length === 0) {
     lines.push("None recorded", "");
     return;
@@ -38,108 +38,147 @@ function pushList(lines, title, values) {
   lines.push("");
 }
 
-function publicEvidence(evidence) {
-  return Array.isArray(evidence)
-    ? evidence.map((item) => ({
-        claim: item.claim,
-        sourceUrl: item.sourceUrl,
-        sourceType: item.sourceType,
-        verifiedAt: item.verifiedAt,
-        ...(item.confidence ? { confidence: item.confidence } : {}),
-      }))
-    : [];
+function uniqueRecordedStrings(values) {
+  const seen = new Set();
+  const unique = [];
+
+  for (const value of values ?? []) {
+    if (typeof value !== "string") continue;
+    const key = value.trim().toLocaleLowerCase("en");
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    unique.push(value);
+  }
+
+  return unique;
 }
 
-function publicIntelligence(profile) {
-  const intelligence = profile.intelligence;
-  if (!isPlainObject(intelligence)) return null;
-  return {
-    profileVersion: intelligence.profileVersion,
-    repositoryStatus: intelligence.status,
-    recordedVerifiedAt: intelligence.verifiedAt,
-    summary: intelligence.summary,
-    designTools: [...(intelligence.designTools ?? [])],
-    deliveryFormats: [...(intelligence.deliveryFormats ?? [])],
-    agentInterfaces: (intelligence.agentInterfaces ?? []).map((item) => ({
-      type: item.type,
-      ...(item.transport ? { transport: item.transport } : {}),
-      ...(item.endpoint ? { endpoint: item.endpoint } : {}),
-      ...(item.status ? { status: item.status } : {}),
-    })),
-    discovery: {
-      textSearch: Boolean(intelligence.discovery?.textSearch),
-      ...(intelligence.discovery?.semanticSearch
-        ? { semanticSearch: intelligence.discovery.semanticSearch }
+function publicAccessRoutes(routes) {
+  return Array.isArray(routes) ? routes.map((route) => ({ ...route })) : [];
+}
+
+function publicAlternatives(profile, similarSources) {
+  if (!Array.isArray(similarSources)) return [];
+
+  const seen = new Set();
+  const alternatives = [];
+  for (const match of similarSources) {
+    const alternative = match?.profile;
+    if (
+      !isPlainObject(alternative) ||
+      alternative.id === profile.id ||
+      typeof alternative.slug !== "string" ||
+      typeof alternative.name !== "string" ||
+      typeof alternative.url !== "string" ||
+      typeof match.differentiator !== "string" ||
+      !match.differentiator.trim() ||
+      seen.has(alternative.id)
+    ) {
+      continue;
+    }
+    seen.add(alternative.id);
+    alternatives.push({
+      slug: alternative.slug,
+      name: alternative.name,
+      canonicalPath: `/resources/${alternative.slug}`,
+      providerUrl: alternative.url,
+      differentiator: match.differentiator,
+    });
+    if (alternatives.length === 2) break;
+  }
+  return alternatives;
+}
+
+function publicDiagnostics(profile) {
+  if (profile.profileLevel === "listed" || !isPlainObject(profile.coverage)) {
+    return null;
+  }
+
+  const coverage = profile.coverage;
+  const governance = profile.intelligence?.governance;
+  const diagnostics = {
+    coverage: {
+      level: coverage.level,
+      ...(coverage.profileStatus
+        ? { profileStatus: coverage.profileStatus }
         : {}),
-      facets: [...(intelligence.discovery?.facets ?? [])],
+      ...(coverage.lastVerifiedAt
+        ? { recordedVerifiedAt: coverage.lastVerifiedAt }
+        : {}),
+      ...(coverage.confidence && coverage.confidence !== "unknown"
+        ? { confidence: coverage.confidence }
+        : {}),
+      ...(coverage.humanReviewStatus !== "not-recorded"
+        ? { humanReviewStatus: coverage.humanReviewStatus }
+        : {}),
+      ...(coverage.freshnessStatus && coverage.freshnessStatus !== "unknown"
+        ? { freshnessStatus: coverage.freshnessStatus }
+        : {}),
     },
-    governance: intelligence.governance
-      ? {
-          defaultPersistence: intelligence.governance.defaultPersistence,
-          assetRedistribution: intelligence.governance.assetRedistribution,
-          sourceAttribution: intelligence.governance.sourceAttribution,
-          userCredentialRequired: Boolean(
-            intelligence.governance.userCredentialRequired,
-          ),
-          termsReviewRequired: Boolean(
-            intelligence.governance.termsReviewRequired,
-          ),
-          notes: [...(intelligence.governance.notes ?? [])],
-        }
-      : null,
+    ...(typeof coverage.evidenceCount === "number" && coverage.evidenceCount > 0
+      ? { evidenceCount: coverage.evidenceCount }
+      : {}),
   };
+
+  if (isPlainObject(governance)) {
+    diagnostics.governance = {
+      ...(governance.defaultPersistence
+        ? { defaultPersistence: governance.defaultPersistence }
+        : {}),
+      ...(governance.assetRedistribution
+        ? { assetRedistribution: governance.assetRedistribution }
+        : {}),
+      ...(governance.sourceAttribution
+        ? { sourceAttribution: governance.sourceAttribution }
+        : {}),
+      ...(typeof governance.userCredentialRequired === "boolean"
+        ? { userCredentialRequired: governance.userCredentialRequired }
+        : {}),
+      ...(typeof governance.termsReviewRequired === "boolean"
+        ? { termsReviewRequired: governance.termsReviewRequired }
+        : {}),
+    };
+  }
+
+  return diagnostics;
 }
 
-export function createPublicSourceRepresentation(profile) {
+/**
+ * Creates a compact, action-first public guide from canonical SourceProfile
+ * truth and optionally supplied deterministic Similar Source matches.
+ */
+export function createPublicSourceRepresentation(profile, similarSources = []) {
   if (!isPlainObject(profile) || typeof profile.slug !== "string") {
     throw new TypeError("A canonical Tessli SourceProfile is required.");
   }
   const canonicalPath = `/resources/${profile.slug}`;
   const jsonPath = `${canonicalPath}/profile.json`;
   const markdownPath = `${canonicalPath}/profile.md`;
+  const diagnostics = publicDiagnostics(profile);
+
   return {
     contract: PUBLIC_SOURCE_REPRESENTATION_CONTRACT,
     canonicalPath,
     representations: { json: jsonPath, markdown: markdownPath },
     source: {
-      contractVersion: profile.contractVersion,
       id: profile.id,
       slug: profile.slug,
       name: profile.name,
-      url: profile.url,
-      domain: profile.domain,
-      summary: profile.summary,
+      purpose: profile.summary,
+      providerUrl: profile.url,
       category: profile.category,
       sourceType: profile.sourceType,
-      sourceTypeBasis: profile.sourceTypeBasis,
-      accessModel: {
-        access: profile.accessModel.access,
-        subscriptionRequired: profile.accessModel.subscriptionRequired,
-      },
       profileLevel: profile.profileLevel,
-      status: profile.status,
-      verifiedAt: profile.verifiedAt,
-      coverage: {
-        level: profile.coverage.level,
-        reason: profile.coverage.reason,
-        profileStatus: profile.coverage.profileStatus,
-        lastVerifiedAt: profile.coverage.lastVerifiedAt,
-        confidence: profile.coverage.confidence,
-        humanReviewStatus: profile.coverage.humanReviewStatus,
-        freshnessStatus: profile.coverage.freshnessStatus,
-        evidenceCount: profile.coverage.evidenceCount,
-      },
-      bestFor: [...profile.bestFor],
-      capabilities: [...profile.capabilities],
-      contentObjects: [...profile.contentObjects],
-      platforms: [...profile.platforms],
-      frameworks: [...profile.frameworks],
-      integrationMethods: [...profile.integrationMethods],
-      accessRoutes: (profile.accessRoutes ?? []).map((route) => ({ ...route })),
-      limitations: [...profile.limitations],
-      evidence: publicEvidence(profile.evidence),
-      intelligence: publicIntelligence(profile),
+      useWhen: uniqueRecordedStrings(profile.bestFor),
+      whatToExplore: uniqueRecordedStrings([
+        ...(profile.capabilities ?? []),
+        ...(profile.contentObjects ?? []),
+      ]),
+      accessRoutes: publicAccessRoutes(profile.accessRoutes),
+      importantLimitations: uniqueRecordedStrings(profile.limitations),
+      alternatives: publicAlternatives(profile, similarSources),
     },
+    ...(diagnostics ? { diagnostics } : {}),
     boundaries: [
       "Repository intelligence is not live-provider verification.",
       "Revalidate provider access, pricing, licensing, terms, availability, and time-sensitive claims.",
@@ -149,85 +188,81 @@ export function createPublicSourceRepresentation(profile) {
   };
 }
 
+function sourceGuide(profile) {
+  const canonicalPath = `/resources/${profile.slug}`;
+  const preferredRoute = (profile.accessRoutes ?? []).find(
+    (route) => route.preferred,
+  );
+  const route = preferredRoute ?? profile.accessRoutes?.[0];
+
+  return {
+    id: profile.id,
+    slug: profile.slug,
+    name: profile.name,
+    canonicalPath,
+    jsonPath: `${canonicalPath}/profile.json`,
+    markdownPath: `${canonicalPath}/profile.md`,
+    providerUrl: profile.url,
+    ...(route ? { accessAction: { ...route } } : {}),
+  };
+}
+
+/**
+ * Creates a compact Collection checklist from a published Collection and the
+ * canonical SourceProfiles it references.
+ */
 export function createPublicCollectionRepresentation(
   collection,
   sourceProfiles,
 ) {
   if (!isPlainObject(collection) || typeof collection.slug !== "string") {
-    throw new TypeError("A published Tessli Playbook is required.");
+    throw new TypeError("A published Tessli Collection is required.");
   }
   const byId = new Map(sourceProfiles.map((profile) => [profile.id, profile]));
-  let order = 0;
-  const resources = collection.stages.flatMap((stage, stageIndex) =>
-    stage.resources.map((item, itemIndex) => {
+  let resourceCount = 0;
+  const stages = collection.stages.map((stage, stageIndex) => ({
+    order: stageIndex + 1,
+    id: stage.id,
+    title: stage.title,
+    resources: stage.resources.map((item, itemIndex) => {
       const resourceId = item.resource?.id ?? item.resourceId;
-      const role = item.role;
       const profile = byId.get(resourceId);
       if (!profile) {
         throw new Error(
-          `Playbook ${collection.slug} references missing source ${resourceId}.`,
+          `Collection ${collection.slug} references missing source ${resourceId}.`,
         );
       }
-      order += 1;
+      resourceCount += 1;
       return {
-        order,
-        stageOrder: stageIndex + 1,
-        stageItemOrder: itemIndex + 1,
-        stageId: stage.id,
-        stageTitle: stage.title,
-        role,
-        id: profile.id,
-        slug: profile.slug,
-        name: profile.name,
-        url: profile.url,
-        domain: profile.domain,
-        summary: profile.summary,
-        category: profile.category,
-        sourceType: profile.sourceType,
-        accessModel: {
-          access: profile.accessModel.access,
-          subscriptionRequired: profile.accessModel.subscriptionRequired,
-        },
-        profileLevel: profile.profileLevel,
-        status: profile.status,
-        tessliPath: `/resources/${profile.slug}`,
-        jsonPath: `/resources/${profile.slug}/profile.json`,
-        markdownPath: `/resources/${profile.slug}/profile.md`,
+        order: itemIndex + 1,
+        role: item.role,
+        inspectPrompt: stage.inspect,
+        decisionPrompt: stage.decision,
+        sourceGuide: sourceGuide(profile),
       };
     }),
-  );
+  }));
   const canonicalPath = `/collections/${collection.slug}`;
   const jsonPath = `${canonicalPath}/collection.json`;
   const markdownPath = `${canonicalPath}/collection.md`;
+
   return {
     contract: PUBLIC_COLLECTION_REPRESENTATION_CONTRACT,
     canonicalPath,
     representations: { json: jsonPath, markdown: markdownPath },
-    playbook: {
+    collection: {
       id: collection.id,
       slug: collection.slug,
       title: collection.title,
       description: collection.description,
       outcome: collection.outcome,
       audience: collection.audience,
-      status: collection.status,
-      lastReviewedAt: collection.lastReviewedAt,
-      stageCount: collection.stages.length,
-      resourceCount: resources.length,
+      stageCount: stages.length,
+      resourceCount,
+      stages,
     },
-    stages: collection.stages.map((stage, index) => ({
-      order: index + 1,
-      id: stage.id,
-      title: stage.title,
-      inspect: stage.inspect,
-      decision: stage.decision,
-      resourceIds: stage.resources.map(
-        (item) => item.resource?.id ?? item.resourceId,
-      ),
-    })),
-    resources,
     boundaries: [
-      "Playbook order is editorial guidance and does not represent popularity, sponsorship, or universal quality.",
+      "Collection order is editorial guidance and does not represent popularity, sponsorship, or universal quality.",
       "Repository intelligence is not live-provider verification.",
       "Revalidate provider access, pricing, licensing, terms, availability, and time-sensitive claims.",
       "No browser-local Board, Saved, account, cookie, or credential data is included.",
@@ -242,94 +277,38 @@ export function serializePublicJson(value) {
 export function serializePublicSourceMarkdown(document) {
   const source = document.source;
   const lines = [
-    `# Tessli Source Profile — ${inline(source.name)}`,
+    `# Tessli Source Guide — ${inline(source.name)}`,
     "",
-    `Contract: ${document.contract}`,
-    `Canonical Tessli path: ${document.canonicalPath}`,
-    `JSON representation: ${document.representations.json}`,
-    `Markdown representation: ${document.representations.markdown}`,
+    `Use this source to ${inline(source.purpose)}`,
     "",
-    "## Source identity",
-    "",
-    `- **ID:** ${inline(source.id)}`,
-    `- **Slug:** ${inline(source.slug)}`,
-    `- **Provider URL:** ${inline(source.url)}`,
-    `- **Domain:** ${inline(source.domain)}`,
-    `- **Category:** ${inline(source.category)}`,
-    `- **Source type:** ${inline(source.sourceType)}`,
-    `- **Access:** ${inline(source.accessModel.access)}`,
-    `- **Subscription required:** ${inline(
-      source.accessModel.subscriptionRequired,
-    )}`,
-    `- **Availability:** ${inline(source.status)}`,
-    `- **Profile level:** ${inline(source.profileLevel)}`,
-    "",
-    "## Canonical summary",
-    "",
-    inline(source.summary),
-    "",
-    "## Coverage",
-    "",
-    `- **Level:** ${inline(source.coverage.level)}`,
-    `- **Reason:** ${inline(source.coverage.reason)}`,
-    `- **Repository profile status:** ${inline(source.coverage.profileStatus)}`,
-    `- **Last recorded verification:** ${inline(
-      source.coverage.lastVerifiedAt,
-    )}`,
-    `- **Confidence:** ${inline(source.coverage.confidence)}`,
-    `- **Human review:** ${inline(source.coverage.humanReviewStatus)}`,
-    `- **Freshness:** ${inline(source.coverage.freshnessStatus)}`,
+    `Tessli guide: ${document.canonicalPath}`,
+    `Provider: ${inline(source.providerUrl)}`,
     "",
   ];
-  pushList(lines, "Best for", source.bestFor);
-  pushList(lines, "Capabilities", source.capabilities);
-  pushList(lines, "Content objects", source.contentObjects);
-  pushList(lines, "Platforms", source.platforms);
-  pushList(lines, "Frameworks", source.frameworks);
-  pushList(lines, "Integration methods", source.integrationMethods);
+  pushList(lines, "Use it when", source.useWhen);
+  pushList(lines, "What to explore", source.whatToExplore);
   lines.push("## How to access", "");
-  for (const route of source.accessRoutes ?? []) {
-    lines.push(
-      `- **${inline(route.kind)}${route.preferred ? " (preferred)" : ""}:** ${inline(route.agentAction)} Auth: ${inline(route.auth)}.${route.url ? ` (${inline(route.url)})` : ""}`,
-    );
-  }
-  if (!source.accessRoutes || source.accessRoutes.length === 0) {
-    lines.push("None recorded");
-  }
-  lines.push("");
-  pushList(lines, "Limitations", source.limitations);
-  lines.push("## Evidence", "");
-  if (source.evidence.length === 0) {
+  if (source.accessRoutes.length === 0) {
     lines.push("None recorded", "");
   } else {
-    for (const item of source.evidence) {
-      const confidence = item.confidence
-        ? `; confidence: ${item.confidence}`
-        : "";
+    for (const route of source.accessRoutes) {
       lines.push(
-        `- ${inline(item.sourceType)} verified ${inline(
-          item.verifiedAt,
-        )}${confidence}: ${inline(item.claim)} (${inline(item.sourceUrl)})`,
+        `- **${inline(route.kind)}${route.preferred ? " (preferred)" : ""}:** ${inline(route.agentAction)} Auth: ${inline(route.auth)}.${route.url ? ` (${inline(route.url)})` : ""}`,
       );
     }
     lines.push("");
   }
-  if (source.intelligence?.governance) {
-    const governance = source.intelligence.governance;
-    lines.push(
-      "## Governance",
-      "",
-      `- **Default persistence:** ${inline(governance.defaultPersistence)}`,
-      `- **Asset redistribution:** ${inline(governance.assetRedistribution)}`,
-      `- **Source attribution:** ${inline(governance.sourceAttribution)}`,
-      `- **User credential required:** ${
-        governance.userCredentialRequired ? "yes" : "no"
-      }`,
-      `- **Terms review required:** ${
-        governance.termsReviewRequired ? "yes" : "no"
-      }`,
-      "",
-    );
+  pushList(lines, "Important limitations", source.importantLimitations);
+  lines.push("## Consider instead", "");
+  if (source.alternatives.length === 0) {
+    lines.push("None recorded", "");
+  } else {
+    for (const alternative of source.alternatives) {
+      lines.push(
+        `- **${inline(alternative.name)}:** ${inline(alternative.differentiator)} Tessli guide: ${inline(alternative.canonicalPath)}. Provider: ${inline(alternative.providerUrl)}.`,
+      );
+    }
+    lines.push("");
   }
   lines.push("## Interpretation boundaries", "");
   for (const boundary of document.boundaries) {
@@ -340,58 +319,43 @@ export function serializePublicSourceMarkdown(document) {
 }
 
 export function serializePublicCollectionMarkdown(document) {
-  const playbook = document.playbook;
+  const collection = document.collection;
   const lines = [
-    `# Tessli Playbook — ${inline(playbook.title)}`,
+    `# Tessli Collection — ${inline(collection.title)}`,
     "",
-    `Contract: ${document.contract}`,
-    `Canonical Tessli path: ${document.canonicalPath}`,
-    `JSON representation: ${document.representations.json}`,
-    `Markdown representation: ${document.representations.markdown}`,
+    `Use this research path to ${inline(collection.outcome)}`,
     "",
-    "## Playbook",
+    inline(collection.description),
     "",
-    inline(playbook.description),
+    `- **Audience:** ${inline(collection.audience)}`,
+    `- **Stages:** ${collection.stageCount}`,
+    `- **Sources:** ${collection.resourceCount}`,
     "",
-    `- **ID:** ${inline(playbook.id)}`,
-    `- **Outcome:** ${inline(playbook.outcome)}`,
-    `- **Audience:** ${inline(playbook.audience)}`,
-    `- **Status:** ${inline(playbook.status)}`,
-    `- **Last reviewed:** ${inline(playbook.lastReviewedAt)}`,
-    `- **Stage count:** ${playbook.stageCount}`,
-    `- **Resource count:** ${playbook.resourceCount}`,
-    "",
-    "## Stages",
+    "## Staged decisions",
     "",
   ];
 
-  for (const stage of document.stages) {
-    lines.push(
-      `### ${stage.order}. ${inline(stage.title)}`,
-      "",
-      `- **Inspect:** ${inline(stage.inspect)}`,
-      `- **Decision supported:** ${inline(stage.decision)}`,
-      "",
-    );
-
-    const stageResources = document.resources.filter(
-      (resource) => resource.stageId === stage.id,
-    );
-    for (const resource of stageResources) {
+  for (const stage of collection.stages) {
+    lines.push(`### ${stage.order}. ${inline(stage.title)}`, "");
+    for (const resource of stage.resources) {
+      const guide = resource.sourceGuide;
       lines.push(
-        `#### ${resource.order}. ${inline(resource.name)}`,
+        `#### ${stage.order}.${resource.order} ${inline(guide.name)}`,
         "",
-        `- **Why included:** ${inline(resource.role)}`,
-        `- **Source ID:** ${inline(resource.id)}`,
-        `- **Provider URL:** ${inline(resource.url)}`,
-        `- **Tessli profile:** ${inline(resource.tessliPath)}`,
-        `- **Category:** ${inline(resource.category)}`,
-        `- **Source type:** ${inline(resource.sourceType)}`,
-        `- **Access:** ${inline(resource.accessModel.access)}`,
-        `- **Profile level:** ${inline(resource.profileLevel)}`,
-        `- **Summary:** ${inline(resource.summary)}`,
-        "",
+        `- **Role:** ${inline(resource.role)}`,
+        `- **Inspect:** ${inline(resource.inspectPrompt)}`,
+        `- **Decide:** ${inline(resource.decisionPrompt)}`,
+        `- **Source guide:** ${inline(guide.canonicalPath)}`,
+        `- **JSON:** ${inline(guide.jsonPath)}`,
+        `- **Markdown:** ${inline(guide.markdownPath)}`,
+        `- **Provider:** ${inline(guide.providerUrl)}`,
       );
+      if (guide.accessAction) {
+        lines.push(
+          `- **Access action:** ${inline(guide.accessAction.agentAction)}${guide.accessAction.url ? ` (${inline(guide.accessAction.url)})` : ""}`,
+        );
+      }
+      lines.push("");
     }
   }
 
