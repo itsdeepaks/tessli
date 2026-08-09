@@ -82,8 +82,8 @@ await mkdir(outputDirectory, { recursive: true });
 await send("Page.enable");
 await send("Page.navigate", { url: `${origin}/` });
 await waitFor(
-  "Boolean(document.querySelector('[data-explore-results=ready]'))",
-  "Explore",
+  "Boolean(document.querySelector('[data-home-task-entry]'))",
+  "Home",
 );
 await evaluate(
   `localStorage.clear(); localStorage.setItem('mosaicary-saved-resources-v1', JSON.stringify([${JSON.stringify(firstResource.url)}])); localStorage.setItem('tessli-saved-resource-ids-v2', JSON.stringify([${JSON.stringify(firstResource.id)}, ${JSON.stringify(secondResource.id)}])); true`,

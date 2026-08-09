@@ -1,99 +1,18 @@
-import catalogue from "@/data/catalogue.json";
-import { ExploreExperience } from "@/components/explore-discovery/explore-experience";
-import type {
-  DiscoveryAccessOption,
-  DiscoveryCategoryOption,
-} from "@/components/explore-discovery/discovery-options";
-import {
-  discoveryAccessValues,
-  parseDiscoveryState,
-  type DiscoveryAccess,
-  type DiscoverySearchParams,
-} from "@/components/explore-discovery/discovery-state";
-import type {
-  ResourceCardAccess,
-  ResourceCardData,
-} from "@/components/resource-card/resource-card";
+import { HomeTaskEntry } from "@/components/home-task-entry/home-task-entry";
+import { ExploreHero } from "@/components/explore-hero/explore-hero";
+import { getPublishedCollections } from "@/lib/collections";
 
 export const metadata = {
-  title: "Explore design resources",
+  title: "Tessli — design research for people and agents",
   description:
-    "Discover a manually curated index of useful web and product design resources.",
+    "Start with a design task, choose relevant sources, and carry the useful decisions into your build.",
 };
 
-const accessLabels: Record<DiscoveryAccess, string> = {
-  free: "Free",
-  freemium: "Freemium",
-  paid: "Paid",
-  "open-source": "Open source",
-  "free-trial": "Free trial",
-};
-
-const categoryCounts = new Map<string, number>();
-const accessCounts = new Map<DiscoveryAccess, number>();
-
-for (const resource of catalogue.resources) {
-  categoryCounts.set(
-    resource.category,
-    (categoryCounts.get(resource.category) ?? 0) + 1,
-  );
-  const access = resource.access as DiscoveryAccess;
-  accessCounts.set(access, (accessCounts.get(access) ?? 0) + 1);
-}
-
-const categoryOptions: readonly DiscoveryCategoryOption[] =
-  catalogue.categories.map((category) => ({
-    id: category.id,
-    label: category.shortLabel,
-    fullLabel: category.label,
-    count: categoryCounts.get(category.id) ?? 0,
-  }));
-
-const accessOptions: readonly DiscoveryAccessOption[] =
-  discoveryAccessValues.map((value) => ({
-    value,
-    label: accessLabels[value],
-    count: accessCounts.get(value) ?? 0,
-  }));
-
-const homepagePreviewLimit = 12;
-const resources: readonly ResourceCardData[] = catalogue.resources
-  .slice(0, homepagePreviewLimit)
-  .map((resource) => ({
-    id: resource.id,
-    slug: resource.slug,
-    name: resource.name,
-    url: resource.url,
-    domain: resource.domain,
-    description: resource.description,
-    category: resource.category,
-    access: resource.access as ResourceCardAccess,
-    usefulFor: resource.usefulFor,
-    tags: resource.tags,
-    status: resource.status as ResourceCardData["status"],
-    faviconUrl: resource.faviconUrl,
-    previewImageUrl: resource.previewImageUrl,
-    previewSource: resource.previewSource as ResourceCardData["previewSource"],
-  }));
-
-const categoryIds = new Set(categoryOptions.map((category) => category.id));
-
-type ExplorePageProps = {
-  searchParams: Promise<DiscoverySearchParams>;
-};
-
-export default async function ExplorePage({ searchParams }: ExplorePageProps) {
-  const initialState = parseDiscoveryState(await searchParams, categoryIds);
-
+export default function HomePage() {
   return (
     <main id="main-content">
-      <ExploreExperience
-        accessOptions={accessOptions}
-        categories={categoryOptions}
-        initialState={initialState}
-        resources={resources}
-        totalResourceCount={catalogue.resources.length}
-      />
+      <ExploreHero />
+      <HomeTaskEntry collections={getPublishedCollections().slice(0, 3)} />
     </main>
   );
 }

@@ -128,8 +128,7 @@ jobs:
           chrome_pid=$!
 
           node tests/explore-search-browser.mjs 2>&1 | tee artifacts/search-browser/interaction.log
-          node tests/discovery-controls-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
-          node tests/explore-results-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
+          node tests/home-task-entry-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/resource-card-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/collections-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/full-reference-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log

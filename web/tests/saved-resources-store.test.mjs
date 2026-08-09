@@ -27,21 +27,19 @@ test("browser-local save store uses stable IDs and migrates both legacy URL keys
   assert.doesNotMatch(store, /removeItem|fetch\(|sessionStorage/);
 });
 
-test("Explore owns persisted save state while resource cards remain independent controls", async () => {
-  const [experience, results] = await Promise.all([
-    read("components/explore-discovery/explore-experience.tsx"),
-    read("components/explore-results/explore-results.tsx"),
+test("Browse owns persisted save state while resource cards remain independent controls", async () => {
+  const [results, card] = await Promise.all([
+    read("components/browse/browse-results.tsx"),
+    read("components/resource-card/resource-card.tsx"),
   ]);
 
-  assert.match(experience, /readSavedResourceIds\(resources\)/);
-  assert.match(
-    experience,
-    /window\.addEventListener\("storage", handleStorage\)/,
-  );
-  assert.match(experience, /writeSavedResourceIds\(next\)/);
-  assert.match(experience, /setSaveAnnouncement/);
-  assert.match(results, /onSavedChange=\{onSavedChange\}/);
-  assert.match(results, /saved=\{savedResourceIds\.has\(resource\.id\)\}/);
+  assert.match(results, /readSavedResourceIds\(cards\)/);
+  assert.match(results, /window\.addEventListener\("storage", handleStorage\)/);
+  assert.match(results, /writeSavedResourceIds\(next\)/);
+  assert.match(results, /setAnnouncement/);
+  assert.match(results, /onSavedChange=\{handleSavedChange\}/);
+  assert.match(results, /saved=\{savedIds\.includes\(card\.id\)\}/);
   assert.match(results, /aria-live="polite"/);
+  assert.match(card, /data-resource-save/);
   assert.doesNotMatch(results, /localStorage|sessionStorage|fetch\(/);
 });

@@ -224,7 +224,7 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.4 Canonical Browse focus NEXT\*\*/,
+    /Status: \*\*active delivery plan — V3\.6 Resource-card consistency NEXT\*\*/,
   );
   assert.match(
     slices,
@@ -241,7 +241,12 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    tableRow("V3.4", "Canonical Browse focus", "NEXT", "V3.2, V3.3"),
+    tableRow("V3.4", "Canonical Browse focus", "DONE", "V3.2, V3.3"),
+  );
+  assert.match(slices, tableRow("V3.5", "Homepage task entry", "DONE", "V3.4"));
+  assert.match(
+    slices,
+    tableRow("V3.6", "Resource-card consistency", "NEXT", "V3.3, V3.4"),
   );
   assert.match(slices, /## 7\. Historical V2 phase status/);
   assert.match(
@@ -318,16 +323,16 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.4 Canonical Browse focus\*\*/,
+    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.6 Resource-card consistency\*\*/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
   assert.match(
     readme,
-    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, and V3\.3 Motion source-guide proof are complete\./,
+    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, and V3\.5 Homepage task entry are complete\./,
   );
   assert.match(
     readme,
-    /next independently reviewable slice is \*\*V3\.4 — Canonical Browse focus\*\*/i,
+    /next independently reviewable slice is \*\*V3\.6 — Resource-card consistency\*\*/i,
   );
   assert.match(
     slices,

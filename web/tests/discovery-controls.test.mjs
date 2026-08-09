@@ -110,22 +110,15 @@ test("discovery controls remain sharp, scroll-safe, and touch complete", async (
   assert.doesNotMatch(css, /border-radius: 1[2-9]px|backdrop-filter/);
 });
 
-test("Explore page passes the validated catalogue into the integrated experience", async () => {
+test("Home delegates task research to its dedicated entry surface", async () => {
   const page = await read("app/page.tsx");
 
-  assert.match(page, /import catalogue from "@\/data\/catalogue\.json"/);
-  assert.match(
-    page,
-    /catalogue\.resources[\s\S]*?\.slice\(0, homepagePreviewLimit\)[\s\S]*?\.map/,
-  );
-  assert.match(page, /const homepagePreviewLimit = 12/);
-  assert.match(page, /catalogue\.categories\.map/);
-  assert.match(page, /parseDiscoveryState\(await searchParams/);
-  assert.match(page, /<ExploreExperience/);
-  assert.match(page, /resources=\{resources\}/);
-  assert.match(page, /previewImageUrl: resource\.previewImageUrl/);
-  assert.match(page, /faviconUrl: resource\.faviconUrl/);
-  assert.doesNotMatch(page, /fetch\(/);
+  assert.match(page, /import \{ ExploreHero \}/);
+  assert.match(page, /import \{ HomeTaskEntry \}/);
+  assert.match(page, /getPublishedCollections\(\)\.slice\(0, 3\)/);
+  assert.match(page, /<ExploreHero \/>/);
+  assert.match(page, /<HomeTaskEntry/);
+  assert.doesNotMatch(page, /catalogue|ExploreExperience|fetch\(/);
 });
 
 test("search supports controlled URL state and live result counts", async () => {
