@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/resources",
     "/collections",
     "/for-ai",
+    "/llms.txt",
     "/about",
     "/curation",
     "/privacy",

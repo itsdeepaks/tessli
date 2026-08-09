@@ -224,7 +224,7 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.10 Machine discovery NEXT\*\*/,
+    /Status: \*\*active delivery plan — V3\.11 Collections as research paths NEXT\*\*/,
   );
   assert.match(
     slices,
@@ -257,7 +257,11 @@ test("release history remains preserved while V3 drives active execution", async
     slices,
     tableRow("V3.9", "Public machine representations v2", "DONE", "V3.7"),
   );
-  assert.match(slices, tableRow("V3.10", "Machine discovery", "NEXT", "V3.9"));
+  assert.match(slices, tableRow("V3.10", "Machine discovery", "DONE", "V3.9"));
+  assert.match(
+    slices,
+    tableRow("V3.11", "Collections as research paths", "NEXT", "V3.3, V3.6"),
+  );
   assert.match(slices, /## 7\. Historical V2 phase status/);
   assert.match(
     plan,
@@ -333,16 +337,16 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.10 Machine discovery\*\*/,
+    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.11 Collections as research paths\*\*/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
   assert.match(
     readme,
-    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, and V3\.9 compact public machine representations are complete\./,
+    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, V3\.9 compact public machine representations, and V3\.10 machine discovery are complete\./,
   );
   assert.match(
     readme,
-    /next independently reviewable slice is \*\*V3\.10 — Machine discovery\*\*/i,
+    /next independently reviewable slice is \*\*V3\.11 — Collections as research paths\*\*/i,
   );
   assert.match(
     slices,
@@ -408,6 +412,11 @@ test("release workflow covers the locked checks and formal viewport set", async 
   assert.match(browser, /data-saved-resources-empty/);
   assert.match(browser, /board-export-title/);
   assert.match(browser, /tessli-project-boards-v1/);
+  assert.match(browser, /robots\.txt/);
+  assert.match(browser, /llms\.txt/);
+  assert.match(browser, /assertOptionalDiscoveryMethod/);
+  assert.match(browser, /\/resources\/landingfolio\/profile\.json/);
+  assert.match(browser, /\/collections\/saas-landing-pages\/collection\.md/);
   assert.match(browser, /scrollWidth > document\.documentElement\.clientWidth/);
   assert.match(workflow, /tessli-phase-1-release-evidence/);
 });

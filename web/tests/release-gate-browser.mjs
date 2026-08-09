@@ -83,6 +83,105 @@ for (const [path, expectedStatus, expectedText] of routeChecks) {
   assert.match(body, new RegExp(expectedText, "i"), `${path} content`);
 }
 
+async function assertOptionalDiscoveryMethod(path, method) {
+  const response = await fetch(`${origin}${path}`, { method });
+  if (response.status === 405) return;
+
+  assert.equal(
+    response.status,
+    method === "OPTIONS" ? 204 : 200,
+    `${path} ${method} status`,
+  );
+  if (method === "HEAD") {
+    assert.equal(await response.text(), "", `${path} HEAD body is empty`);
+    assert.match(
+      response.headers.get("content-type") ?? "",
+      /^text\/plain/i,
+      `${path} HEAD content type`,
+    );
+  }
+  if (method === "OPTIONS") {
+    assert.match(
+      response.headers.get("allow") ?? "",
+      /GET/i,
+      `${path} OPTIONS allows GET`,
+    );
+  }
+}
+
+const robotsResponse = await fetch(`${origin}/robots.txt`);
+const robots = await robotsResponse.text();
+assert.equal(robotsResponse.status, 200, "/robots.txt status");
+assert.match(
+  robotsResponse.headers.get("content-type") ?? "",
+  /^text\/plain/i,
+  "/robots.txt content type",
+);
+assert.match(
+  robots,
+  /^Sitemap:\s*.+\/sitemap\.xml\s*$/imu,
+  "/robots.txt sitemap",
+);
+for (const pathname of [
+  "/auth",
+  "/submit",
+  "/suggest",
+  "/boards",
+  "/lab/",
+  "/proofs/",
+]) {
+  assert.match(
+    robots,
+    new RegExp(`^Disallow:\\s*${pathname.replaceAll("/", "\\/")}\\s*$`, "imu"),
+    `/robots.txt disallows ${pathname}`,
+  );
+}
+await assertOptionalDiscoveryMethod("/robots.txt", "HEAD");
+await assertOptionalDiscoveryMethod("/robots.txt", "OPTIONS");
+
+const llmsResponse = await fetch(`${origin}/llms.txt`);
+const llms = await llmsResponse.text();
+assert.equal(llmsResponse.status, 200, "/llms.txt status");
+assert.match(
+  llmsResponse.headers.get("content-type") ?? "",
+  /^text\/plain/i,
+  "/llms.txt content type",
+);
+for (const fragment of [
+  "/resources",
+  "/collections",
+  "/resources/landingfolio/profile.json",
+  "/resources/landingfolio/profile.md",
+  "/collections/saas-landing-pages/collection.json",
+  "/collections/saas-landing-pages/collection.md",
+]) {
+  assert.match(
+    llms,
+    new RegExp(fragment.replaceAll("/", "\\/")),
+    `/llms.txt ${fragment}`,
+  );
+}
+assert.match(llms, /local\s+MCP/i, "/llms.txt local MCP boundary");
+assert.match(
+  llms,
+  /No Board or Saved data is public:[\s\S]*browser-local and private/i,
+  "/llms.txt Board privacy boundary",
+);
+assert.match(
+  llms,
+  /no hosted(?: or remote)? MCP endpoint/i,
+  "/llms.txt hosted MCP boundary",
+);
+for (const boundary of ["bulk", "credential", "crawl", "universal", "taste"]) {
+  assert.match(
+    llms,
+    new RegExp(`(?:no|not)\\b[\\s\\S]{0,80}\\b${boundary}\\b`, "i"),
+    `/llms.txt ${boundary} boundary`,
+  );
+}
+await assertOptionalDiscoveryMethod("/llms.txt", "HEAD");
+await assertOptionalDiscoveryMethod("/llms.txt", "OPTIONS");
+
 const machineRouteChecks = [
   {
     path: "/resources/designindex/profile.json",
