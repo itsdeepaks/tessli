@@ -176,12 +176,12 @@ async function assertCardActions(surface) {
     `${surface} keeps Visit independent from internal profile navigation.`,
   );
   assert.equal(
-    audit.visit?.rel?.split(/\\s+/).includes("noopener"),
+    audit.visit?.rel?.split(/\s+/).includes("noopener"),
     true,
     `${surface} protects Visit with noopener.`,
   );
   assert.equal(
-    audit.visit?.rel?.split(/\\s+/).includes("noreferrer"),
+    audit.visit?.rel?.split(/\s+/).includes("noreferrer"),
     true,
     `${surface} protects Visit with noreferrer.`,
   );
