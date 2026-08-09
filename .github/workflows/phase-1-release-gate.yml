@@ -104,7 +104,7 @@ jobs:
           curl --fail --silent --show-error \
             http://127.0.0.1:3000/for-ai > /tmp/tessli-release-for-ai.html
           grep -q "Give models structured design research" /tmp/tessli-release-for-ai.html
-          grep -q "verify_resource" /tmp/tessli-release-for-ai.html
+          grep -q "create_research_brief" /tmp/tessli-release-for-ai.html
 
           chrome_bin="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           test -n "$chrome_bin"
