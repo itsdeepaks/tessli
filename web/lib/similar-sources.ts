@@ -3,15 +3,74 @@ import { getAllSourceProfiles } from "./source-profiles.ts";
 
 export interface SimilarSourceMatch {
   profile: SourceProfile;
-  reasons: readonly string[];
+  differentiator: string;
 }
 
-function overlapCount(left: readonly string[], right: readonly string[]) {
-  const rightValues = new Set(right);
-  return left.reduce(
-    (count, value) => count + Number(rightValues.has(value)),
-    0,
+function label(value: string) {
+  return value
+    .split("-")
+    .map((part) => part[0]?.toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function firstRecordedDifference(
+  source: SourceProfile,
+  candidate: SourceProfile,
+): { differentiator: string; priority: number } | null {
+  const candidateWorkflow = candidate.bestFor.find(
+    (item) => !source.bestFor.includes(item),
   );
+  if (candidateWorkflow) {
+    return {
+      differentiator: `Recorded task fit: ${label(candidateWorkflow)}.`,
+      priority: 1,
+    };
+  }
+
+  const candidateCapability = candidate.capabilities.find(
+    (item) => !source.capabilities.includes(item),
+  );
+  if (candidateCapability) {
+    return {
+      differentiator: `Recorded capability: ${label(candidateCapability)}.`,
+      priority: 2,
+    };
+  }
+
+  const candidateContent = candidate.contentObjects.find(
+    (item) => !source.contentObjects.includes(item),
+  );
+  if (candidateContent) {
+    return {
+      differentiator: `Recorded material: ${label(candidateContent)}.`,
+      priority: 3,
+    };
+  }
+
+  const candidateFramework = candidate.frameworks.find(
+    (item) => !source.frameworks.includes(item),
+  );
+  if (candidateFramework) {
+    return {
+      differentiator: `Recorded framework: ${label(candidateFramework)}.`,
+      priority: 4,
+    };
+  }
+
+  const candidateAccessRoute = candidate.accessRoutes.find(
+    (route) =>
+      !source.accessRoutes.some(
+        (sourceRoute) => sourceRoute.kind === route.kind,
+      ),
+  );
+  if (candidateAccessRoute) {
+    return {
+      differentiator: `Recorded access route: ${label(candidateAccessRoute.kind)}.`,
+      priority: 5,
+    };
+  }
+
+  return null;
 }
 
 export function getSimilarSourceProfiles(
@@ -21,62 +80,24 @@ export function getSimilarSourceProfiles(
   if (limit <= 0) return [];
 
   return getAllSourceProfiles()
-    .filter((candidate) => candidate.id !== source.id)
-    .map((candidate) => {
-      const reasons: string[] = [];
-      let score = 0;
-
-      if (candidate.category === source.category) {
-        score += 8;
-        reasons.push("Same research category");
-      }
-      if (candidate.sourceType === source.sourceType) {
-        score += 6;
-        reasons.push("Same source type");
-      }
-
-      const capabilityOverlap = overlapCount(
-        source.capabilities,
-        candidate.capabilities,
-      );
-      if (capabilityOverlap > 0) {
-        score += capabilityOverlap * 3;
-        reasons.push(`${capabilityOverlap} shared capabilities`);
-      }
-
-      const objectOverlap = overlapCount(
-        source.contentObjects,
-        candidate.contentObjects,
-      );
-      if (objectOverlap > 0) {
-        score += objectOverlap * 2;
-        reasons.push(`${objectOverlap} shared content objects`);
-      }
-
-      const frameworkOverlap = overlapCount(
-        source.frameworks,
-        candidate.frameworks,
-      );
-      if (frameworkOverlap > 0) {
-        score += frameworkOverlap * 2;
-        reasons.push(`${frameworkOverlap} shared frameworks`);
-      }
-
-      if (
-        source.profileLevel !== "listed" &&
-        candidate.profileLevel !== "listed"
-      ) {
-        score += 1;
-      }
-
-      return { candidate, reasons, score };
+    .filter(
+      (candidate) =>
+        candidate.id !== source.id &&
+        candidate.category === source.category &&
+        candidate.intelligence,
+    )
+    .flatMap((candidate) => {
+      const difference = firstRecordedDifference(source, candidate);
+      return difference ? [{ candidate, ...difference }] : [];
     })
-    .filter((match) => match.score > 0)
     .sort(
       (left, right) =>
-        right.score - left.score ||
+        left.priority - right.priority ||
         left.candidate.name.localeCompare(right.candidate.name),
     )
     .slice(0, limit)
-    .map(({ candidate, reasons }) => ({ profile: candidate, reasons }));
+    .map(({ candidate, differentiator }) => ({
+      profile: candidate,
+      differentiator,
+    }));
 }

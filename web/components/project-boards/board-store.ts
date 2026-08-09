@@ -88,13 +88,22 @@ export function parseBoards(value: string | null): readonly ProjectBoard[] {
 
 export function readBoards(): readonly ProjectBoard[] {
   if (typeof window === "undefined") return [];
-  return parseBoards(window.localStorage.getItem(boardStoreKey));
+  try {
+    return parseBoards(window.localStorage.getItem(boardStoreKey));
+  } catch {
+    return [];
+  }
 }
 
 export function writeBoards(boards: readonly ProjectBoard[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(boardStoreKey, JSON.stringify(boards));
-  window.dispatchEvent(new CustomEvent(boardStoreEvent));
+  if (typeof window === "undefined") return false;
+  try {
+    window.localStorage.setItem(boardStoreKey, JSON.stringify(boards));
+    window.dispatchEvent(new CustomEvent(boardStoreEvent));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export function createBoard(name: string): ProjectBoard {

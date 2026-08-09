@@ -9,8 +9,15 @@ const page = await readFile(
   new URL("../app/resources/[slug]/page.tsx", import.meta.url),
   "utf8",
 );
-const actions = await readFile(
-  new URL("../components/source-detail/source-actions.tsx", import.meta.url),
+const detail = await readFile(
+  new URL(
+    "../components/source-detail/intelligence-detail.tsx",
+    import.meta.url,
+  ),
+  "utf8",
+);
+const styles = await readFile(
+  new URL("../app/resources/[slug]/source-detail.module.css", import.meta.url),
   "utf8",
 );
 const sitemap = await readFile(
@@ -27,34 +34,47 @@ test("source detail keeps the complete canonical route set", () => {
   assert.match(page, /alternates: \{ canonical:/);
 });
 
-test("source detail exposes truthful progressive profile state", () => {
+test("source detail follows the V3.3 guide-first reading order", () => {
   for (const text of [
-    "Availability",
-    "Coverage",
-    "Freshness",
-    "Evidence records",
-    "Human review",
-    "Best-for information",
-    "Known limitations",
+    "Use it when",
+    "What to explore",
+    "How to access it",
+    "Works with",
+    "Important limitations",
+    "Consider instead",
     "Collections",
+    "Source details and references",
   ]) {
-    assert.match(page, new RegExp(text));
+    assert.match(`${page}\n${detail}`, new RegExp(text));
   }
-  assert.match(page, /items=\{profile\.bestFor\}/);
-  assert.match(page, /items=\{profile\.limitations\}/);
-  assert.match(page, /items\.length > 0/);
-  assert.match(page, /profile\.evidence\.length/);
-  assert.doesNotMatch(page, /Add to board/);
+
+  assert.match(page, /<SourceActions resource=\{card\}/);
+  assert.match(page, /className=\{styles\.preview\}/);
+  assert.match(page, /referrerPolicy="no-referrer"/);
+  assert.match(page, /previewMark/);
+  assert.doesNotMatch(page, /<iframe|coverage-title|Evidence records/);
 });
 
-test("source actions preserve local save and safe provider exit", () => {
-  assert.match(actions, /readSavedResourceIds/);
-  assert.match(actions, /writeSavedResourceIds/);
-  assert.match(actions, /aria-pressed/);
-  assert.match(actions, /aria-live="polite"/);
-  assert.match(actions, /rel="noopener noreferrer"/);
-  assert.match(actions, /target="_blank"/);
-  assert.match(actions, /Provider currently unavailable/);
+test("Listed source guidance uses honest compact fallbacks", () => {
+  assert.match(
+    page,
+    /No structured task-fit guidance is recorded for this Listed source/,
+  );
+  assert.match(
+    detail,
+    /No structured exploration points are recorded for this Listed source/,
+  );
+  assert.match(detail, /No structured limitation is recorded/);
+  assert.match(detail, /No differentiated alternatives are recorded/);
+});
+
+test("source guide styling preserves a fixed preview and narrow-screen recomposition", () => {
+  assert.match(styles, /\.preview \{/);
+  assert.match(styles, /aspect-ratio: 16 \/ 10/);
+  assert.match(styles, /\.previewMark/);
+  assert.match(styles, /@media \(max-width: 820px\)/);
+  assert.match(styles, /@media \(max-width: 420px\)/);
+  assert.doesNotMatch(styles, /backdrop-filter|linear-gradient\([^\n]*purple/i);
 });
 
 test("sitemap includes every canonical source profile", () => {

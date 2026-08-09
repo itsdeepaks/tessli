@@ -13,24 +13,40 @@ async function read(relativePath) {
   return readFile(path.join(webRoot, relativePath), "utf8");
 }
 
-test("source detail renders recorded intelligence without live verification claims", async () => {
-  const page = await read("app/resources/[slug]/page.tsx");
-  const detail = await read("components/source-detail/intelligence-detail.tsx");
+test("source detail uses recorded intelligence as guidance and keeps diagnostics quiet", async () => {
+  const [page, detail] = await Promise.all([
+    read("app/resources/[slug]/page.tsx"),
+    read("components/source-detail/intelligence-detail.tsx"),
+  ]);
 
   assert.ok(page.includes("getSimilarSourceProfiles(profile, 4)"));
   assert.ok(page.includes("<IntelligenceDetail profile={profile}"));
-  assert.ok(detail.includes("not a live provider verification"));
-  assert.ok(detail.includes("Governance"));
-  assert.ok(detail.includes("Evidence"));
-  assert.ok(detail.includes("not a universal quality ranking"));
+  assert.ok(detail.includes("What to explore"));
+  assert.ok(detail.includes("How to access it"));
+  assert.ok(detail.includes("Recorded governance"));
+  assert.ok(detail.includes("Recorded references"));
+  assert.ok(detail.includes("Source details and references"));
+  assert.ok(detail.includes("does not imply live provider verification"));
+  assert.doesNotMatch(
+    detail,
+    /Recorded capabilities and boundaries|Research intelligence/,
+  );
 });
 
-test("similar sources use explainable metadata instead of popularity", async () => {
-  const similar = await read("lib/similar-sources.ts");
+test("alternatives state a recorded difference instead of overlap counts or popularity", async () => {
+  const [detail, similar] = await Promise.all([
+    read("components/source-detail/intelligence-detail.tsx"),
+    read("lib/similar-sources.ts"),
+  ]);
 
+  assert.ok(detail.includes("match.differentiator"));
   assert.ok(similar.includes("candidate.category === source.category"));
-  assert.ok(similar.includes("candidate.sourceType === source.sourceType"));
-  assert.ok(similar.includes("capabilityOverlap"));
-  assert.ok(similar.includes("contentObjects"));
-  assert.doesNotMatch(similar, /popularity|rating|trend/i);
+  assert.ok(similar.includes("Recorded task fit"));
+  assert.ok(similar.includes("Recorded capability"));
+  assert.ok(similar.includes("Recorded access route"));
+  assert.doesNotMatch(
+    similar,
+    /overlapCount|shared capabilities|contentObjects.*overlap/i,
+  );
+  assert.doesNotMatch(`${detail}\n${similar}`, /popularity|rating|trend/i);
 });
