@@ -25,7 +25,7 @@
 
 .controls {
   display: grid;
-  grid-template-columns: minmax(15rem, 2fr) repeat(5, minmax(8rem, 1fr));
+  grid-template-columns: minmax(15rem, 2fr) repeat(6, minmax(7rem, 1fr));
   min-width: 0;
   gap: 0.75rem;
   align-items: end;
@@ -82,9 +82,21 @@
 .filterBackdrop,
 .filterSheetHeader,
 .filterClose,
-.filterSheetKicker,
-.clearFilters {
+.filterSheetKicker {
   display: none;
+}
+
+.clearFilters {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: inherit;
+  font-weight: 650;
+  text-align: center;
+  text-decoration: none;
 }
 
 .summary {
@@ -97,19 +109,13 @@
   margin: 1.5rem 0;
 }
 
-.viewLinks,
 .pagination,
-.rowActions {
+.emptyActions {
   display: flex;
   min-width: 0;
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
-}
-
-.viewLinks a[aria-current="page"] {
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.25rem;
 }
 
 .cardGrid {
@@ -119,90 +125,31 @@
   gap: 1rem;
 }
 
-.rowActions button {
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: transparent;
-  padding: 0.45rem 0.7rem;
-  cursor: pointer;
-}
-
-.compactList {
-  display: grid;
-  min-width: 0;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--color-border);
-}
-
-.compactList li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  min-width: 0;
-  gap: 1.5rem;
-  align-items: center;
-  padding: 1.25rem 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.compactList li > * {
-  min-width: 0;
-}
-
-.compactList h2,
-.compactList p {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.compactList h2 {
-  margin-block: 0.2rem 0.4rem;
-  font-size: 1.15rem;
-}
-
-.domain,
-.meta,
-.unavailable {
+.resultContext {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  margin: 0.35rem 0 0;
   overflow-wrap: anywhere;
-}
-
-.tableScroller {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  overflow-x: auto;
-  border: 1px solid var(--color-border);
-}
-
-.table {
-  width: 100%;
-  min-width: 760px;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.table th,
-.table td {
-  padding: 0.9rem 1rem;
-  border-bottom: 1px solid var(--color-border);
-  vertical-align: top;
-}
-
-.table th small {
-  display: block;
-  margin-top: 0.2rem;
-  color: var(--color-text-muted);
-  font-weight: 400;
 }
 
 .empty {
   padding: 4rem 0;
   text-align: center;
   border-block: 1px solid var(--color-border);
+}
+
+.emptyActions {
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.emptyActions a {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 0 0.85rem;
 }
 
 .pagination {
@@ -384,85 +331,6 @@
   }
 
   .cardGrid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .tableScroller {
-    overflow: visible;
-    border: 0;
-  }
-
-  .table {
-    display: block;
-    min-width: 0;
-  }
-
-  .table thead {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .table tbody {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .table tr {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    min-width: 0;
-    border: 1px solid var(--color-border);
-    padding: 0.75rem;
-  }
-
-  .table th,
-  .table td {
-    display: block;
-    min-width: 0;
-    padding: 0.65rem;
-    border: 0;
-    overflow-wrap: anywhere;
-  }
-
-  .table tbody th {
-    grid-column: 1 / -1;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .table tbody td {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .table tbody td::before {
-    display: block;
-    margin-bottom: 0.25rem;
-    color: var(--color-text-muted);
-    content: attr(data-label);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .table tbody td:last-child {
-    grid-column: 1 / -1;
-    border-bottom: 0;
-  }
-
-  .table tbody td:last-child::before {
-    margin-bottom: 0.5rem;
-  }
-
-  .table .rowActions {
-    justify-content: flex-start;
-  }
-
-  .compactList li {
     grid-template-columns: minmax(0, 1fr);
   }
 

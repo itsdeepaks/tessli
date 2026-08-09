@@ -12,9 +12,7 @@ import catalogue from "@/data/catalogue.json";
 import {
   browseAccessValues,
   browseHref,
-  browseProfileLevelValues,
   browseSortValues,
-  browseViewValues,
   deriveBrowseResults,
   parseBrowseState,
   type BrowseSearchParams,
@@ -27,9 +25,9 @@ import {
 } from "@/lib/source-profiles";
 
 export const metadata = {
-  title: "Browse design sources",
+  title: "Find design sources for your task",
   description:
-    "Search, filter, and evaluate Tessli's curated design and frontend sources before visiting the provider.",
+    "Describe a design or frontend task, then refine Tessli's curated sources by category, type, and access.",
 };
 
 const accessLabels: Readonly<Record<string, string>> = {
@@ -38,12 +36,6 @@ const accessLabels: Readonly<Record<string, string>> = {
   paid: "Paid",
   "open-source": "Open source",
   "free-trial": "Free trial",
-};
-
-const profileLevelLabels: Readonly<Record<string, string>> = {
-  listed: "Listed",
-  profiled: "Profiled",
-  verified: "Verified",
 };
 
 const sourceTypeLabels: Readonly<Record<string, string>> = Object.fromEntries(
@@ -94,6 +86,30 @@ function withState(state: BrowseState, patch: Partial<BrowseState>) {
   return browseHref({ ...state, ...patch });
 }
 
+function clearRefinementsHref(state: BrowseState) {
+  return withState(state, {
+    access: [],
+    category: null,
+    page: 1,
+    sort: "curated",
+    sourceType: null,
+  });
+}
+
+function resultContext(state: BrowseState) {
+  const refinements = [
+    state.category ? categoryLabels.get(state.category) : null,
+    state.sourceType ? sourceTypeLabels[state.sourceType] : null,
+    ...state.access.map((access) => accessLabels[access]),
+  ].filter((value): value is string => Boolean(value));
+
+  const task = state.query ? ` for “${state.query}”` : "";
+  const filters =
+    refinements.length > 0 ? ` with ${refinements.join(", ")}` : "";
+
+  return `${task}${filters}`;
+}
+
 type ResourcesPageProps = Readonly<{
   searchParams: Promise<BrowseSearchParams>;
 }>;
@@ -119,11 +135,11 @@ export default async function ResourcesPage({
     <main className={styles.page} id="main-content">
       <div className="tessli-container">
         <header className={styles.header}>
-          <p>Source Index · Research Intelligence</p>
-          <h1>Browse design sources</h1>
+          <p>Find sources for a design task</p>
+          <h1>What are you trying to design?</h1>
           <p className={styles.lede}>
-            Search the curated catalogue, inspect Tessli coverage, save useful
-            sources, and visit providers only after evaluating fit.
+            Describe the work in front of you, then narrow the source set by
+            category, source type, or access.
           </p>
         </header>
 
@@ -135,10 +151,6 @@ export default async function ResourcesPage({
           categories={catalogue.categories.map((category) => ({
             value: category.id,
             label: category.label,
-          }))}
-          profileLevelOptions={browseProfileLevelValues.map((level) => ({
-            value: level,
-            label: profileLevelLabels[level],
           }))}
           sortOptions={browseSortValues.map((sort) => ({
             value: sort,
@@ -159,35 +171,32 @@ export default async function ResourcesPage({
         <section aria-labelledby="browse-results-title">
           <div className={styles.summary}>
             <div>
-              <p>
-                Page {result.page} of {result.pageCount}
-              </p>
               <h2 id="browse-results-title">
-                {result.total} {result.total === 1 ? "source" : "sources"}
+                {result.total} matching{" "}
+                {result.total === 1 ? "source" : "sources"}
               </h2>
+              <p className={styles.resultContext}>
+                Showing sources that fit your task{resultContext(state)}. Page{" "}
+                {result.page} of {result.pageCount}.
+              </p>
             </div>
-            <nav aria-label="Result view" className={styles.viewLinks}>
-              {browseViewValues.map((view) => (
-                <Link
-                  aria-current={state.view === view ? "page" : undefined}
-                  href={withState(state, { page: 1, view })}
-                  key={view}
-                  scroll={false}
-                >
-                  {view[0]?.toUpperCase() + view.slice(1)}
-                </Link>
-              ))}
-            </nav>
           </div>
 
           {resources.length === 0 ? (
             <div className={styles.empty}>
               <h2>No matching sources</h2>
-              <p>Remove a filter or broaden the search query.</p>
-              <Link href="/resources">Reset Browse</Link>
+              <p>
+                Clear a refinement, or try a broader description of the task.
+              </p>
+              <div className={styles.emptyActions}>
+                <Link href="/resources">Reset Browse</Link>
+                {state.query ? (
+                  <Link href={clearRefinementsHref(state)}>Keep this task</Link>
+                ) : null}
+              </div>
             </div>
           ) : (
-            <BrowseResults resources={resources} view={state.view} />
+            <BrowseResults resources={resources} />
           )}
 
           {result.pageCount > 1 ? (

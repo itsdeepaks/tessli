@@ -60,7 +60,7 @@ const routeChecks = [
     200,
     "Design systems worth studying",
   ],
-  ["/resources", 200, "Browse design sources"],
+  ["/resources", 200, "What are you trying to design?"],
   ["/resources/designindex", 200, "How to access it"],
   ["/saved", 200, "Search and refine the references kept in this browser"],
   ["/boards", 200, "Project boards"],

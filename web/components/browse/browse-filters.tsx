@@ -17,7 +17,6 @@ type BrowseFiltersProps = Readonly<{
   categories: readonly BrowseFilterOption[];
   accessOptions: readonly BrowseFilterOption[];
   sourceTypeOptions: readonly BrowseFilterOption[];
-  profileLevelOptions: readonly BrowseFilterOption[];
   sortOptions: readonly BrowseFilterOption[];
 }>;
 
@@ -29,7 +28,6 @@ function activeFilterCount(state: BrowseState) {
     Number(Boolean(state.category)) +
     Number(state.access.length > 0) +
     Number(Boolean(state.sourceType)) +
-    Number(Boolean(state.profileLevel)) +
     Number(state.sort !== "curated")
   );
 }
@@ -67,14 +65,16 @@ export function BrowseFilters({
   categories,
   accessOptions,
   sourceTypeOptions,
-  profileLevelOptions,
   sortOptions,
 }: BrowseFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const count = activeFilterCount(state);
-  const clearHref = browseHref({ ...defaultBrowseState, view: state.view });
+  const clearHref = browseHref({
+    ...defaultBrowseState,
+    query: state.query,
+  });
 
   const restoreFocus = useCallback(() => {
     window.setTimeout(() => {
@@ -171,7 +171,7 @@ export function BrowseFilters({
           defaultValue={state.query}
           maxLength={160}
           name="q"
-          placeholder="Name, task, framework…"
+          placeholder="e.g. accessible colour system or SaaS dashboard"
           type="search"
         />
       </label>
@@ -209,8 +209,8 @@ export function BrowseFilters({
         >
           <div className={styles.filterSheetHeader}>
             <div>
-              <p className={styles.filterSheetKicker}>Browse controls</p>
-              <h2 id="browse-filter-title">Filter and sort</h2>
+              <p className={styles.filterSheetKicker}>Refine this source set</p>
+              <h2 id="browse-filter-title">Refine results</h2>
             </div>
             <button
               aria-label="Close filters"
@@ -245,13 +245,6 @@ export function BrowseFilters({
               value={state.sourceType ?? ""}
             />
             <FilterSelect
-              allLabel="All coverage levels"
-              label="Coverage"
-              name="profileLevel"
-              options={profileLevelOptions}
-              value={state.profileLevel ?? ""}
-            />
-            <FilterSelect
               label="Sort"
               name="sort"
               options={sortOptions}
@@ -261,18 +254,18 @@ export function BrowseFilters({
 
           <div className={styles.filterActions}>
             <button type="submit">Apply filters</button>
-            <Link
-              className={styles.clearFilters}
-              href={clearHref}
-              onClick={closeFilters}
-            >
-              Clear all
-            </Link>
+            {count > 0 ? (
+              <Link
+                className={styles.clearFilters}
+                href={clearHref}
+                onClick={closeFilters}
+              >
+                Clear refinements
+              </Link>
+            ) : null}
           </div>
         </div>
       </div>
-
-      <input name="view" type="hidden" value={state.view} />
     </form>
   );
 }

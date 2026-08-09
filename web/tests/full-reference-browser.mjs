@@ -103,12 +103,11 @@ const defaultFilterAudit = await evaluate(`(() => ({
   values: [...document.querySelectorAll('select')].map((select) => select.value),
   labels: [...document.querySelectorAll('select')].map((select) => select.selectedOptions[0]?.textContent.trim()),
 }))()`);
-assert.deepEqual(defaultFilterAudit.values, ["", "", "", "", "curated"]);
+assert.deepEqual(defaultFilterAudit.values, ["", "", "", "curated"]);
 assert.deepEqual(defaultFilterAudit.labels, [
   "All categories",
   "All access models",
   "All source types",
-  "All coverage levels",
   "Curated order",
 ]);
 const cardAudit = await evaluate(`(() => ({
@@ -128,30 +127,19 @@ assert.equal(cardAudit.saves, 24);
 assert.match(cardAudit.nextHref, /page=2/);
 assert.equal(cardAudit.overflow, false);
 
-await navigate("/resources?view=list&page=2");
+await navigate("/resources?view=list&profileLevel=profiled&page=2");
 assert.equal(
   await evaluate(
-    `document.querySelectorAll('[data-browse-view=list] > li').length`,
+    `document.querySelectorAll('[data-browse-view=cards] article').length`,
   ),
-  50,
+  24,
 );
 assert.equal(
   await evaluate(
-    `document.querySelector('[data-browse-view=list] a')?.getAttribute('href')?.startsWith('/resources/')`,
+    `document.querySelector('[data-browse-view=cards] a')?.getAttribute('href')?.startsWith('/resources/')`,
   ),
   true,
 );
-
-await navigate("/resources?view=table&profileLevel=profiled");
-const tableAudit = await evaluate(`(() => ({
-  rows: document.querySelectorAll('[data-browse-view=table] tbody tr').length,
-  caption: Boolean(document.querySelector('[data-browse-view=table] caption')),
-  levels: [...document.querySelectorAll('[data-browse-view=table] tbody tr td:nth-child(4)')]
-    .every((cell) => cell.textContent.trim() === 'profiled'),
-}))()`);
-assert.equal(tableAudit.rows, 40);
-assert.equal(tableAudit.caption, true);
-assert.equal(tableAudit.levels, true);
 
 await send("Emulation.setDeviceMetricsOverride", {
   width: 390,
@@ -205,22 +193,43 @@ await waitFor(
   "mobile Browse filter focus restoration",
 );
 
-await navigate("/resources?view=table");
-const mobileTableAudit = await evaluate(`(() => ({
+await navigate("/resources?view=table&profileLevel=verified");
+const mobileCardAudit = await evaluate(`(() => ({
   overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
-  tableDisplay: getComputedStyle(document.querySelector('[data-browse-view=table] table')).display,
-  rowDisplay: getComputedStyle(document.querySelector('[data-browse-view=table] tbody tr')).display,
-  labels: [...document.querySelectorAll('[data-browse-view=table] tbody td')].slice(0, 4).map((cell) => cell.getAttribute('data-label')),
+  cards: document.querySelectorAll('[data-browse-view=cards] article').length,
 }))()`);
-assert.equal(mobileTableAudit.overflow, false);
-assert.equal(mobileTableAudit.tableDisplay, "block");
-assert.equal(mobileTableAudit.rowDisplay, "grid");
-assert.deepEqual(mobileTableAudit.labels, [
-  "Type",
-  "Access",
-  "Coverage",
-  "Actions",
-]);
+assert.equal(mobileCardAudit.overflow, false);
+assert.equal(mobileCardAudit.cards, 24);
+
+for (const [width, height] of [
+  [1024, 768],
+  [768, 1024],
+  [320, 844],
+]) {
+  await send("Emulation.setDeviceMetricsOverride", {
+    width,
+    height,
+    deviceScaleFactor: 1,
+    mobile: width <= 390,
+  });
+  await navigate("/resources?q=motion");
+  const responsiveAudit = await evaluate(`(() => ({
+    cards: document.querySelectorAll('[data-browse-view=cards] article').length,
+    hasHeading: Boolean(document.querySelector('h1')),
+    overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
+  }))()`);
+  assert.equal(responsiveAudit.cards > 0, true, `Browse cards at ${width}px`);
+  assert.equal(
+    responsiveAudit.hasHeading,
+    true,
+    `Browse heading at ${width}px`,
+  );
+  assert.equal(
+    responsiveAudit.overflow,
+    false,
+    `Browse overflow at ${width}px`,
+  );
+}
 
 await send("Page.navigate", { url: `${origin}/resources?sort=verified` });
 await waitFor(

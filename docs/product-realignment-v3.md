@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.3 — Motion source-guide proof**
+Next implementation slice: **V3.4 — Canonical Browse focus**
 
 ## 1. Product definition
 
@@ -430,4 +430,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.3 Source guide vertical proof**. It turns Motion into the first useful human research guide, while keeping Browse, Home, and resource-card consistency in their later dedicated slices.
+Start **V3.4 Canonical Browse focus**. It makes `/resources` task-first, keeps its URL state and card actions truthful, and leaves Home and shared-card consistency to their later dedicated slices.

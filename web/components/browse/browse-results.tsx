@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   ResourceCard,
-  type ResourceCardAccess,
   type ResourceCardData,
 } from "@/components/resource-card/resource-card";
 import {
@@ -24,35 +22,9 @@ type BrowseResult = Readonly<{
 
 type BrowseResultsProps = Readonly<{
   resources: readonly BrowseResult[];
-  view: "cards" | "list" | "table";
 }>;
 
-const accessLabels: Record<ResourceCardAccess, string> = {
-  free: "Free",
-  freemium: "Freemium",
-  paid: "Paid",
-  "open-source": "Open source",
-  "free-trial": "Free trial",
-};
-
-function ExternalLink({ resource }: { resource: ResourceCardData }) {
-  if (resource.status === "unavailable") {
-    return <span className={styles.unavailable}>Provider unavailable</span>;
-  }
-  return (
-    <a href={resource.url} rel="noopener noreferrer" target="_blank">
-      Visit source ↗
-    </a>
-  );
-}
-
-function saveLabel(resourceName: string, saved: boolean) {
-  return saved
-    ? `Remove ${resourceName} from saved resources`
-    : `Save ${resourceName}`;
-}
-
-export function BrowseResults({ resources, view }: BrowseResultsProps) {
+export function BrowseResults({ resources }: BrowseResultsProps) {
   const cards = useMemo(() => resources.map((item) => item.card), [resources]);
   const [savedIds, setSavedIds] = useState<readonly string[]>([]);
   const [announcement, setAnnouncement] = useState("");
@@ -80,127 +52,23 @@ export function BrowseResults({ resources, view }: BrowseResultsProps) {
     [cards, savedIds],
   );
 
-  if (view === "cards") {
-    return (
-      <>
-        <p aria-live="polite" className={styles.srOnly}>
-          {announcement}
-        </p>
-        <div className={styles.cardGrid} data-browse-view="cards">
-          {resources.map(({ profile, categoryLabel, card }) => (
-            <ResourceCard
-              categoryLabel={categoryLabel}
-              onSavedChange={handleSavedChange}
-              profileHref={`/resources/${profile.slug}`}
-              resource={{ ...card, description: profile.summary }}
-              saved={savedIds.includes(card.id)}
-              key={profile.id}
-            />
-          ))}
-        </div>
-      </>
-    );
-  }
-
-  if (view === "table") {
-    return (
-      <>
-        <p aria-live="polite" className={styles.srOnly}>
-          {announcement}
-        </p>
-        <div className={styles.tableScroller} data-browse-view="table">
-          <table className={styles.table}>
-            <caption className={styles.srOnly}>
-              Current Tessli source results
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Source</th>
-                <th scope="col">Type</th>
-                <th scope="col">Access</th>
-                <th scope="col">Coverage</th>
-                <th scope="col">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {resources.map(({ profile, card }) => (
-                <tr key={profile.id}>
-                  <th scope="row">
-                    <Link href={`/resources/${profile.slug}`}>
-                      {profile.name}
-                    </Link>
-                    <small>{profile.domain}</small>
-                  </th>
-                  <td data-label="Type">
-                    {profile.sourceType.replaceAll("-", " ")}
-                  </td>
-                  <td data-label="Access">{accessLabels[card.access]}</td>
-                  <td data-label="Coverage">{profile.profileLevel}</td>
-                  <td data-label="Actions">
-                    <div className={styles.rowActions}>
-                      <button
-                        aria-label={saveLabel(
-                          card.name,
-                          savedIds.includes(card.id),
-                        )}
-                        aria-pressed={savedIds.includes(card.id)}
-                        onClick={() =>
-                          handleSavedChange(
-                            card.id,
-                            !savedIds.includes(card.id),
-                          )
-                        }
-                        type="button"
-                      >
-                        {savedIds.includes(card.id) ? "Saved" : "Save"}
-                      </button>
-                      <ExternalLink resource={card} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <p aria-live="polite" className={styles.srOnly}>
         {announcement}
       </p>
-      <ul className={styles.compactList} data-browse-view="list">
+      <div className={styles.cardGrid} data-browse-view="cards">
         {resources.map(({ profile, categoryLabel, card }) => (
-          <li key={profile.id}>
-            <div>
-              <p className={styles.domain}>{profile.domain}</p>
-              <h2>
-                <Link href={`/resources/${profile.slug}`}>{profile.name}</Link>
-              </h2>
-              <p>{profile.summary}</p>
-              <p className={styles.meta}>
-                {categoryLabel} · {accessLabels[card.access]} ·{" "}
-                {profile.profileLevel}
-              </p>
-            </div>
-            <div className={styles.rowActions}>
-              <button
-                aria-label={saveLabel(card.name, savedIds.includes(card.id))}
-                aria-pressed={savedIds.includes(card.id)}
-                onClick={() =>
-                  handleSavedChange(card.id, !savedIds.includes(card.id))
-                }
-                type="button"
-              >
-                {savedIds.includes(card.id) ? "Saved" : "Save"}
-              </button>
-              <ExternalLink resource={card} />
-            </div>
-          </li>
+          <ResourceCard
+            categoryLabel={categoryLabel}
+            key={profile.id}
+            onSavedChange={handleSavedChange}
+            profileHref={`/resources/${profile.slug}`}
+            resource={{ ...card, description: profile.summary }}
+            saved={savedIds.includes(card.id)}
+          />
         ))}
-      </ul>
+      </div>
     </>
   );
 }

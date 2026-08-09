@@ -1,8 +1,4 @@
-import type {
-  SourceCoverageLevel,
-  SourceProfile,
-  SourceType,
-} from "./source-profiles";
+import type { SourceProfile, SourceType } from "./source-profiles";
 
 export const browseAccessValues = [
   "free",
@@ -12,25 +8,16 @@ export const browseAccessValues = [
   "free-trial",
 ] as const;
 export const browseSortValues = ["curated", "name-asc", "name-desc"] as const;
-export const browseViewValues = ["cards", "list", "table"] as const;
-export const browseProfileLevelValues = [
-  "listed",
-  "profiled",
-  "verified",
-] as const;
 
 export type BrowseAccess = (typeof browseAccessValues)[number];
 export type BrowseSort = (typeof browseSortValues)[number];
-export type BrowseView = (typeof browseViewValues)[number];
 
 export type BrowseState = Readonly<{
   query: string;
   category: string | null;
   access: readonly BrowseAccess[];
   sourceType: SourceType | null;
-  profileLevel: SourceCoverageLevel | null;
   sort: BrowseSort;
-  view: BrowseView;
   page: number;
 }>;
 
@@ -43,16 +30,12 @@ export const defaultBrowseState: BrowseState = {
   category: null,
   access: [],
   sourceType: null,
-  profileLevel: null,
   sort: "curated",
-  view: "cards",
   page: 1,
 };
 
 const accessSet = new Set<string>(browseAccessValues);
 const sortSet = new Set<string>(browseSortValues);
-const viewSet = new Set<string>(browseViewValues);
-const profileLevelSet = new Set<string>(browseProfileLevelValues);
 
 function values(input: BrowseSearchParams, name: string) {
   const value = input[name];
@@ -80,9 +63,7 @@ export function parseBrowseState(
 ): BrowseState {
   const categoryValue = first(input, "category");
   const sourceTypeValue = first(input, "sourceType");
-  const profileLevelValue = first(input, "profileLevel");
   const sortValue = first(input, "sort");
-  const viewValue = first(input, "view");
 
   return {
     query: normalizeQuery(first(input, "q")),
@@ -95,12 +76,8 @@ export function parseBrowseState(
     sourceType: sourceTypes.has(sourceTypeValue)
       ? (sourceTypeValue as SourceType)
       : null,
-    profileLevel: profileLevelSet.has(profileLevelValue)
-      ? (profileLevelValue as SourceCoverageLevel)
-      : null,
     // Legacy sort=verified intentionally normalizes to curated until verified data exists.
     sort: sortSet.has(sortValue) ? (sortValue as BrowseSort) : "curated",
-    view: viewSet.has(viewValue) ? (viewValue as BrowseView) : "cards",
     page: positiveInteger(first(input, "page")),
   };
 }
@@ -111,9 +88,7 @@ export function serializeBrowseState(state: BrowseState) {
   if (state.category) params.set("category", state.category);
   if (state.access.length > 0) params.set("access", state.access.join(","));
   if (state.sourceType) params.set("sourceType", state.sourceType);
-  if (state.profileLevel) params.set("profileLevel", state.profileLevel);
   if (state.sort !== "curated") params.set("sort", state.sort);
-  if (state.view !== "cards") params.set("view", state.view);
   if (state.page > 1) params.set("page", String(state.page));
   return params.toString();
 }
@@ -155,8 +130,6 @@ export function deriveBrowseResults(
       return false;
     if (state.sourceType && profile.sourceType !== state.sourceType)
       return false;
-    if (state.profileLevel && profile.profileLevel !== state.profileLevel)
-      return false;
     return true;
   });
 
@@ -166,7 +139,7 @@ export function deriveBrowseResults(
     filtered.sort((a, b) => b.name.localeCompare(a.name));
   }
 
-  const pageSize = state.view === "cards" ? 24 : 50;
+  const pageSize = 24;
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const page = Math.min(state.page, pageCount);
   const start = (page - 1) * pageSize;
