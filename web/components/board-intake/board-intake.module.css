@@ -1,0 +1,177 @@
+.intake {
+  display: contents;
+}
+
+.intake > button,
+.dialog button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control-md);
+  background: var(--surface);
+  color: var(--text-strong);
+  cursor: pointer;
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-size: var(--text-label);
+  font-weight: 700;
+}
+
+.intake > button:hover,
+.dialog button:hover {
+  border-color: var(--accent-text);
+  color: var(--accent-text);
+}
+
+.intake > button:focus-visible,
+.dialog button:focus-visible,
+.dialog input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.dialog {
+  width: min(calc(100% - 32px), 544px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text-strong);
+  padding: clamp(28px, 5vw, 42px);
+}
+
+.dialog::backdrop {
+  background: color-mix(in srgb, var(--text-strong) 38%, transparent);
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.dialogHeader h2 {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: var(--text-h2);
+  font-weight: 610;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent-text);
+  font-size: var(--text-label);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.copy,
+.emptyBoards {
+  margin: var(--space-4) 0 0;
+  color: var(--text-body);
+  line-height: 1.5;
+}
+
+.feedback {
+  margin: var(--space-4) 0 0;
+  border-left: 2px solid var(--accent-text);
+  background: var(--surface-muted);
+  color: var(--text-strong);
+  padding: var(--space-3) var(--space-4);
+}
+
+.boardList {
+  display: grid;
+  margin-top: var(--space-5);
+  border-top: 1px solid var(--line);
+}
+
+.boardList button {
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  padding-inline: 0;
+  text-align: left;
+}
+
+.boardList small {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+
+.createBoardForm {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-6);
+}
+
+.createBoardForm label {
+  color: var(--text-muted);
+  font-size: var(--text-label);
+  font-weight: 700;
+}
+
+.createBoardForm input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control-md);
+  background: var(--surface);
+  color: var(--text-strong);
+  padding: 0 var(--space-3);
+  font: inherit;
+}
+
+.createBoardForm button {
+  justify-self: start;
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 480px) {
+  .dialog {
+    padding: var(--space-5);
+  }
+
+  .dialogHeader {
+    align-items: center;
+  }
+
+  .dialogHeader h2 {
+    font-size: clamp(1.75rem, 9vw, var(--text-h2));
+  }
+
+  .boardList button,
+  .createBoardForm button {
+    width: 100%;
+  }
+}
+
+@media (forced-colors: active) {
+  .dialog {
+    border: 1px solid CanvasText;
+  }
+}

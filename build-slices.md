@@ -1,6 +1,6 @@
 # Tessli V3 — Build Slices
 
-Status: **active delivery plan — V3.12 Saved-to-Board flow NEXT**
+Status: **active delivery plan — V3.13 Board agent handoff NEXT**
 Rule: one independently reviewable vertical slice per branch and pull request.  
 Product direction: `docs/product-realignment-v3.md`
 
@@ -8,7 +8,7 @@ The previous detailed Phase 1 ledger and legacy slice numbers remain available i
 
 - completed V2 and legacy `14.x` work remains traceable;
 - V3.0 reconciled authority documentation and V3.1 completed public IA hygiene on 2026-08-08;
-- V3.2 completed the AccessRoute contract pilot, V3.3 completed the Motion source-guide proof, V3.4 focused canonical Browse, V3.5 completed the homepage task entry, V3.6 completed resource-card consistency, V3.7 completed deterministic task retrieval, V3.8 completed local MCP v2, V3.9 completed compact public machine representations, V3.10 completed machine discovery, and V3.11 completed Collections as research paths; V3.12–V3.17 are the remaining ordered delivery sequence.
+- V3.2 completed the AccessRoute contract pilot, V3.3 completed the Motion source-guide proof, V3.4 focused canonical Browse, V3.5 completed the homepage task entry, V3.6 completed resource-card consistency, V3.7 completed deterministic task retrieval, V3.8 completed local MCP v2, V3.9 completed compact public machine representations, V3.10 completed machine discovery, V3.11 completed Collections as research paths, and V3.12 completed Saved-to-Board flow; V3.13–V3.17 are the remaining ordered delivery sequence.
 
 ## 1. Mandatory read order
 
@@ -120,8 +120,8 @@ Completed code is not automatically approval for later-phase functionality. Publ
 | V3.9  | Public machine representations v2 | DONE     | V3.7                    |
 | V3.10 | Machine discovery                 | DONE     | V3.9                    |
 | V3.11 | Collections as research paths     | DONE     | V3.3, V3.6              |
-| V3.12 | Saved-to-Board flow               | NEXT     | V3.3, V3.6              |
-| V3.13 | Board agent handoff               | PLANNED  | V3.12                   |
+| V3.12 | Saved-to-Board flow               | DONE     | V3.3, V3.6              |
+| V3.13 | Board agent handoff               | NEXT     | V3.12                   |
 | V3.14 | For AI redesign                   | PLANNED  | V3.8–V3.10, V3.13       |
 | V3.15 | Live-preview pilot                | DEFERRED | V3.3; separate approval |
 | V3.16 | Hosted remote MCP                 | DEFERRED | V3.8–V3.10              |
@@ -395,6 +395,6 @@ The following was the pre-V3 continuation state and is retained only as evidence
 - **Product Foundation:** Phase 1 / Slice 1.6 was `NEXT`. It would have begun the first bounded operator-reviewed Verified batch while preserving the distinction between repository profiling, current provider evidence, and promotion.
 - **Proof and UI Judgment:** Slice 5.3 remains BLOCKED on a genuine human-review artifact; Slices 5.4 and 6.2 and Phase 7 remain blocked behind that evidence.
 
-V3.0 replaced this continuation boundary. The next repository slice is **V3.12 Saved-to-Board flow**. Verification remains a maintenance and evidence concern, not the next public product milestone. Do not invent provider checks, reuse stale profile fingerprints, store credentials or private provider content, or overstate availability.
+V3.0 replaced this continuation boundary. The next repository slice is **V3.13 Board agent handoff**. Verification remains a maintenance and evidence concern, not the next public product milestone. Do not invent provider checks, reuse stale profile fingerprints, store credentials or private provider content, or overstate availability.
 
 No recurring scheduled development task is enabled or permitted for this workflow.

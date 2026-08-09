@@ -47,7 +47,7 @@ test("Saved page provides a local, searchable workspace with reversible changes"
   assert.match(experience, /aria-live="polite"/);
   assert.doesNotMatch(
     experience,
-    /fetch\(|sessionStorage|sign in|supabase|cloud|project board|notes/i,
+    /fetch\(|sessionStorage|sign in|supabase|cloud/i,
   );
 
   assert.match(styles, /\.workspace/);

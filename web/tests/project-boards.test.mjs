@@ -30,22 +30,25 @@ test("project boards use a backward-compatible versioned browser-local contract"
 });
 
 test("Source Guide adds resources to local Boards with accessible feedback", async () => {
-  const actions = await read("components/source-detail/source-actions.tsx");
+  const [actions, intake] = await Promise.all([
+    read("components/source-detail/source-actions.tsx"),
+    read("components/board-intake/board-intake.tsx"),
+  ]);
+  assert.match(actions, /<BoardIntake resource=\{resource\} \/>/);
   for (const phrase of [
     "Add to Board",
     "Create Board and add source",
     "boardStoreKey",
     'aria-haspopup="dialog"',
-    "onCancel",
     "onClose",
     "already on",
     "could not save the Board",
     "not uploaded or synced",
   ]) {
-    assert.match(actions, new RegExp(phrase.replaceAll(".", "\\."), "i"));
+    assert.match(intake, new RegExp(phrase.replaceAll(".", "\\."), "i"));
   }
-  assert.match(actions, /item\.resourceId === resource\.id/);
-  assert.match(actions, /boardTriggerRef\.current\?\.focus\(\)/);
+  assert.match(intake, /item\.resourceId === resource\.id/);
+  assert.match(intake, /triggerRef\.current\?\.focus\(\)/);
 });
 
 test("project boards support explicit research decisions and local export", async () => {

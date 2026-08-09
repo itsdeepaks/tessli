@@ -100,6 +100,136 @@ assert.deepEqual(
   [secondResource.slug, firstResource.slug],
 );
 
+const boardName = "Saved browser research";
+await evaluate(
+  `(() => {
+    const trigger = Array.from(
+      document.querySelectorAll('[data-saved-resource-grid] button'),
+    ).find((button) => button.textContent?.trim() === 'Add to Board');
+    if (!(trigger instanceof HTMLButtonElement)) {
+      throw new Error('Saved Add to Board trigger was not found.');
+    }
+    trigger.click();
+    return true;
+  })()`,
+);
+await waitFor(
+  "Boolean(document.querySelector('dialog[open]'))",
+  "Board picker",
+);
+assert.deepEqual(
+  await evaluate(
+    `(() => {
+      const dialog = document.querySelector('dialog[open]');
+      const titleId = dialog?.getAttribute('aria-labelledby');
+      const title = titleId ? document.getElementById(titleId)?.textContent?.trim() : '';
+      return {
+        title,
+        privateCopy: Boolean(
+          dialog?.textContent?.includes('Boards stay in this browser and are not uploaded or synced.'),
+        ),
+      };
+    })()`,
+  ),
+  {
+    title: `Add ${secondResource.name} to a Board`,
+    privateCopy: true,
+  },
+);
+await evaluate(
+  `(() => {
+    const input = document.querySelector('dialog[open] input');
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error('Board name input was not found.');
+    }
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      'value',
+    )?.set;
+    setter?.call(input, ${JSON.stringify(boardName)});
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.closest('form')?.requestSubmit();
+    return true;
+  })()`,
+);
+await waitFor(
+  "!document.querySelector('dialog[open]')",
+  "created Board picker close",
+);
+assert.deepEqual(
+  await evaluate(
+    `(() => JSON.parse(localStorage.getItem('tessli-project-boards-v1') ?? '[]').map((board) => ({
+      name: board.name,
+      items: board.items,
+    })))()`,
+  ),
+  [
+    {
+      name: boardName,
+      items: [
+        {
+          resourceId: secondResource.id,
+          note: "",
+          decision: "undecided",
+          rationale: "",
+        },
+      ],
+    },
+  ],
+);
+
+await evaluate(
+  `(() => {
+    const trigger = Array.from(
+      document.querySelectorAll('[data-saved-resource-grid] button'),
+    ).find((button) => button.textContent?.trim() === 'Add to Board');
+    if (!(trigger instanceof HTMLButtonElement)) {
+      throw new Error('Saved Add to Board trigger was not found.');
+    }
+    trigger.click();
+    return true;
+  })()`,
+);
+await waitFor(
+  "Boolean(document.querySelector('dialog[open]'))",
+  "duplicate Board picker",
+);
+await evaluate(
+  `(() => {
+    const choice = Array.from(document.querySelectorAll('dialog[open] button')).find(
+      (button) => button.textContent?.includes(${JSON.stringify(boardName)}),
+    );
+    if (!(choice instanceof HTMLButtonElement)) {
+      throw new Error('Created Board choice was not found.');
+    }
+    choice.click();
+    return true;
+  })()`,
+);
+await waitFor(
+  "Boolean(document.querySelector('dialog[open] [role=status]')?.textContent?.includes('already on'))",
+  "duplicate feedback",
+);
+await send("Input.dispatchKeyEvent", {
+  type: "keyDown",
+  key: "Escape",
+  code: "Escape",
+  nativeVirtualKeyCode: 27,
+  windowsVirtualKeyCode: 27,
+});
+await send("Input.dispatchKeyEvent", {
+  type: "keyUp",
+  key: "Escape",
+  code: "Escape",
+  nativeVirtualKeyCode: 27,
+  windowsVirtualKeyCode: 27,
+});
+await waitFor("!document.querySelector('dialog[open]')", "closed Board picker");
+await waitFor(
+  "Array.from(document.querySelectorAll('[data-saved-resource-grid] button')).some((button) => document.activeElement === button && button.textContent?.trim() === 'Add to Board')",
+  "Board trigger focus return",
+);
+
 await evaluate("document.querySelector('[data-clear-saved]').click(); true");
 await waitFor(
   "Boolean(document.querySelector('dialog[open]'))",
@@ -109,6 +239,15 @@ await send("Input.dispatchKeyEvent", {
   type: "keyDown",
   key: "Escape",
   code: "Escape",
+  nativeVirtualKeyCode: 27,
+  windowsVirtualKeyCode: 27,
+});
+await send("Input.dispatchKeyEvent", {
+  type: "keyUp",
+  key: "Escape",
+  code: "Escape",
+  nativeVirtualKeyCode: 27,
+  windowsVirtualKeyCode: 27,
 });
 await waitFor("!document.querySelector('dialog[open]')", "closed confirmation");
 await waitFor(
