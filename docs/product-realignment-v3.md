@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.7 — Deterministic task retrieval**
+Next implementation slice: **V3.8 — Local MCP v2**
 
 ## 1. Product definition
 
@@ -432,4 +432,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.7 Deterministic task retrieval**. It returns a small, deterministic, explained shortlist from the canonical source truth without redesigning Browse, Home, or source guides.
+Start **V3.8 Local MCP v2**. It replaces the normal local agent workflow with five focused read-only capabilities backed by the completed deterministic task retrieval contract.
