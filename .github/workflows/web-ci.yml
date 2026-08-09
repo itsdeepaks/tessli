@@ -112,7 +112,7 @@ jobs:
           fi
           grep -q "What are you trying to design?" /tmp/tessli-resources.html
           grep -q 'data-browse-view="cards"' /tmp/tessli-resources.html
-          grep -q "Inspect Tessli profile" /tmp/tessli-resources.html
+          grep -q 'data-resource-inspect=' /tmp/tessli-resources.html
 
           curl --fail --silent --show-error \
             http://127.0.0.1:3000/resources/designindex > /tmp/tessli-profile.html
