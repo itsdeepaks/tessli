@@ -1,0 +1,228 @@
+.section {
+  padding-bottom: var(--space-10);
+  border-bottom: 1px solid var(--line, #d8d1c8);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--text-muted, #78716a);
+  font-size: var(--text-label, 0.75rem);
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.section h2 {
+  margin: var(--space-2) 0 var(--space-5);
+  color: var(--text-strong, #151412);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.guideList,
+.alternatives,
+.accessRoutes {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guideList li {
+  position: relative;
+  padding-left: 1.1rem;
+  color: var(--text-body, #4f4a44);
+  line-height: 1.55;
+}
+
+.guideList li::before {
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 0.45rem;
+  height: 1px;
+  background: var(--accent, #f05217);
+  content: "";
+}
+
+.accessRoutes {
+  gap: 0;
+  border-top: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.accessRoutes li {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.accessRoutes li > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.accessRoutes strong {
+  color: var(--text-strong, #151412);
+  font-size: 1rem;
+}
+
+.accessRoutes span {
+  color: var(--accent-text, #b9380e);
+  font-size: var(--text-label, 0.75rem);
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.accessRoutes p,
+.alternatives p,
+.coverageNote {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text-body, #4f4a44);
+  line-height: 1.55;
+}
+
+.routeMeta,
+.emptyNote,
+.coverageNote {
+  color: var(--text-muted, #78716a) !important;
+  font-size: 0.92rem;
+}
+
+.accessRoutes a,
+.alternatives a,
+.diagnostics a {
+  width: fit-content;
+  color: var(--accent-text, #b9380e);
+  font-weight: 650;
+  text-underline-offset: 0.18em;
+}
+
+.alternatives {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.alternatives li {
+  min-width: 0;
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.alternatives li:nth-child(odd) {
+  padding-right: var(--space-6);
+  border-right: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.alternatives li:nth-child(even) {
+  padding-left: var(--space-6);
+}
+
+.alternatives a {
+  color: var(--text-strong, #151412);
+  font-size: 1.05rem;
+}
+
+.alternatives p {
+  margin-top: var(--space-2);
+}
+
+.diagnostics {
+  color: var(--text-muted, #78716a);
+  padding-top: var(--space-2);
+}
+
+.diagnostics summary {
+  width: fit-content;
+  min-height: 44px;
+  cursor: pointer;
+  padding-top: var(--space-3);
+  color: var(--text-body, #4f4a44);
+  font-weight: 650;
+}
+
+.diagnostics summary:focus-visible {
+  outline: 3px solid var(--focus, #1d4ed8);
+  outline-offset: 3px;
+}
+
+.diagnosticsBody {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--line-subtle, #e5dfd7);
+  padding-top: var(--space-6);
+}
+
+.diagnostics dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--space-6);
+  margin: 0;
+  border-top: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.diagnostics dl div {
+  display: grid;
+  grid-template-columns: minmax(6rem, 0.8fr) minmax(0, 1.2fr);
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.diagnostics dt {
+  font-size: var(--text-label, 0.75rem);
+}
+
+.diagnostics dd {
+  margin: 0;
+  color: var(--text-body, #4f4a44);
+  overflow-wrap: anywhere;
+}
+
+.diagnostics h3 {
+  margin: 0 0 var(--space-3);
+  color: var(--text-body, #4f4a44);
+  font-size: var(--text-label, 0.75rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.diagnostics ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.diagnostics li {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .alternatives,
+  .diagnostics dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .alternatives li:nth-child(odd),
+  .alternatives li:nth-child(even) {
+    padding-right: 0;
+    padding-left: 0;
+    border-right: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .diagnostics dl div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+}

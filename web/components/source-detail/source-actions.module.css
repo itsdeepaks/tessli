@@ -46,3 +46,122 @@
   white-space: nowrap;
   border: 0;
 }
+
+.boardDialog {
+  width: min(100% - 2rem, 34rem);
+  max-height: min(42rem, calc(100vh - 2rem));
+  padding: clamp(1.25rem, 4vw, 2rem);
+  overflow: auto;
+  border: 1px solid var(--color-border-strong, #3b3832);
+  background: var(--color-canvas, #f5f0e7);
+  color: var(--color-text, #24221f);
+}
+
+.boardDialog::backdrop {
+  background: rgb(36 34 31 / 45%);
+}
+
+.dialogHeader {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.dialogHeader h2 {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.65rem, 5vw, 2.35rem);
+  line-height: 1;
+}
+
+.dialogHeader > button {
+  flex: 0 0 auto;
+}
+
+.dialogEyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dialogCopy,
+.emptyBoards {
+  margin: 1.25rem 0 0;
+  line-height: 1.5;
+}
+
+.boardList {
+  display: grid;
+  gap: 0;
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--color-border, #c9c2b8);
+}
+
+.boardList button {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 3.25rem;
+  padding-inline: 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-border, #c9c2b8);
+  text-align: left;
+}
+
+.boardList small {
+  color: var(--color-text-muted, #6f695f);
+}
+
+.createBoardForm {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border, #c9c2b8);
+}
+
+.createBoardForm label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.createBoardForm label > span {
+  font-size: 0.9rem;
+}
+
+.createBoardForm input {
+  min-height: 2.75rem;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--color-border-strong, #3b3832);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.createBoardForm button {
+  justify-self: start;
+}
+
+.boardDialog button:focus-visible,
+.boardDialog input:focus-visible {
+  outline: 3px solid var(--color-accent, #d86127);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .wrapper > * {
+    flex: 1 1 100%;
+  }
+
+  .wrapper .unavailable {
+    flex-basis: auto;
+  }
+
+  .dialogHeader {
+    align-items: center;
+  }
+}

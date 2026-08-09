@@ -29,14 +29,6 @@ function label(value: string) {
     .join(" ");
 }
 
-function dateLabel(value: string | null) {
-  if (!value) return "Not recorded";
-  return new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeZone: "UTC",
-  }).format(new Date(`${value}T00:00:00.000Z`));
-}
-
 function resourceCard(id: string): ResourceCardData {
   const item = resources.get(id);
   if (!item) throw new Error(`Missing catalogue record for ${id}.`);
@@ -56,6 +48,14 @@ function resourceCard(id: string): ResourceCardData {
     previewImageUrl: item.previewImageUrl,
     previewSource: item.previewSource as ResourceCardData["previewSource"],
   };
+}
+
+function generatedMark(name: string) {
+  return (
+    Array.from(name.trim())
+      .find((character) => /[a-z0-9]/i.test(character))
+      ?.toUpperCase() ?? "T"
+  );
 }
 
 export function generateStaticParams() {
@@ -99,108 +99,58 @@ export default async function SourceProfilePage({ params }: Props) {
         </nav>
 
         <header className={styles.hero}>
-          <div>
+          <div className={styles.identity}>
             <p className={styles.eyebrow}>
-              {categories.get(profile.category) ?? label(profile.category)} ·{" "}
-              {label(profile.profileLevel)}
+              {categories.get(profile.category) ?? label(profile.category)}
             </p>
             <h1>{profile.name}</h1>
             <p className={styles.summary}>{profile.summary}</p>
           </div>
-          <aside
-            className={styles.sidebar}
-            aria-label="Source actions and facts"
-          >
-            <SourceActions resource={card} />
-            <dl className={styles.facts}>
-              <div>
-                <dt>Domain</dt>
-                <dd>{profile.domain}</dd>
-              </div>
-              <div>
-                <dt>Source type</dt>
-                <dd>{label(profile.sourceType)}</dd>
-              </div>
-              <div>
-                <dt>Access</dt>
-                <dd>{label(profile.accessModel.access)}</dd>
-              </div>
-              <div>
-                <dt>Availability</dt>
-                <dd>{label(profile.status)}</dd>
-              </div>
-              <div>
-                <dt>Coverage</dt>
-                <dd>{label(profile.profileLevel)}</dd>
-              </div>
-            </dl>
-          </aside>
+
+          <figure className={styles.preview}>
+            <span aria-hidden="true" className={styles.previewMark}>
+              {generatedMark(profile.name)}
+            </span>
+            {card.previewImageUrl ? (
+              // Native img keeps arbitrary approved third-party preview URLs out
+              // of Next's image optimiser. The mark remains as a visual fallback.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt={`Preview of ${profile.name}`}
+                className={styles.previewImage}
+                decoding="async"
+                loading="eager"
+                referrerPolicy="no-referrer"
+                src={card.previewImageUrl}
+              />
+            ) : null}
+            <figcaption>
+              {card.previewImageUrl
+                ? "Approved preview metadata. Tessli does not embed the provider."
+                : "No approved preview is recorded for this source."}
+            </figcaption>
+          </figure>
         </header>
 
-        <div className={styles.content}>
-          <div className={styles.sections}>
-            <section
-              className={styles.section}
-              aria-labelledby="coverage-title"
-            >
-              <p className={styles.kicker}>Tessli coverage</p>
-              <h2 id="coverage-title">What this profile supports</h2>
-              <p>{profile.coverage.reason}</p>
-              <dl className={styles.facts}>
-                <div>
-                  <dt>Freshness</dt>
-                  <dd>{label(profile.coverage.freshnessStatus)}</dd>
-                </div>
-                <div>
-                  <dt>Evidence review</dt>
-                  <dd>{dateLabel(profile.coverage.lastVerifiedAt)}</dd>
-                </div>
-                <div>
-                  <dt>Evidence records</dt>
-                  <dd>{profile.coverage.evidenceCount}</dd>
-                </div>
-                <div>
-                  <dt>Human review</dt>
-                  <dd>{label(profile.coverage.humanReviewStatus)}</dd>
-                </div>
-              </dl>
-            </section>
+        <section aria-label="Source actions" className={styles.actions}>
+          <SourceActions resource={card} />
+        </section>
 
-            <ProfileList
-              title="Best-for information"
-              kicker="Task fit"
-              items={profile.bestFor}
-              empty="Structured task-fit research is not recorded for this Listed source."
-            />
-            <ProfileList
-              title="Known limitations"
-              kicker="Boundaries"
-              items={profile.limitations}
-              empty="No structured limitations are recorded. Verify pricing, licensing, availability, and current behaviour with the source."
-            />
+        <div className={styles.guide}>
+          <ProfileList
+            title="Use it when"
+            kicker="Task fit"
+            items={profile.bestFor}
+            empty="No structured task-fit guidance is recorded for this Listed source. Start with its canonical description and provider page."
+          />
 
-            <section
-              className={styles.section}
-              aria-labelledby="evidence-title"
-            >
-              <p className={styles.kicker}>Evidence</p>
-              <h2 id="evidence-title">Source-backed profile state</h2>
-              <p
-                className={
-                  profile.evidence.length === 0 ? styles.emptyNote : undefined
-                }
-              >
-                {profile.evidence.length > 0
-                  ? `${profile.evidence.length} evidence record${profile.evidence.length === 1 ? " is" : "s are"} linked below.`
-                  : "No structured evidence record is linked. This page does not imply live verification."}
-              </p>
-            </section>
+          <IntelligenceDetail profile={profile} similar={similar} />
 
-            <IntelligenceDetail profile={profile} similar={similar} />
-          </div>
-
-          <aside className={styles.aside} aria-labelledby="collections-title">
-            <p className={styles.kicker}>Curated context</p>
+          <section
+            className={styles.collectionSection}
+            aria-labelledby="collections-title"
+          >
+            <p className={styles.kicker}>Research path</p>
             <h2 id="collections-title">Collections</h2>
             {memberships.length > 0 ? (
               <ul className={styles.collectionList}>
@@ -209,6 +159,7 @@ export default async function SourceProfilePage({ params }: Props) {
                     <Link href={`/collections/${collection.slug}`}>
                       {collection.title}
                     </Link>
+                    <p>{collection.outcome}</p>
                   </li>
                 ))}
               </ul>
@@ -217,7 +168,7 @@ export default async function SourceProfilePage({ params }: Props) {
                 Not currently included in a published collection.
               </p>
             )}
-          </aside>
+          </section>
         </div>
       </div>
     </main>
@@ -243,7 +194,7 @@ function ProfileList({
       {items.length > 0 ? (
         <ul className={styles.list}>
           {items.map((item) => (
-            <li key={item}>{item}</li>
+            <li key={item}>{label(item)}</li>
           ))}
         </ul>
       ) : (

@@ -5,140 +5,235 @@
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-2, 0.5rem);
   align-items: center;
+  color: var(--text-muted, #78716a);
   font-size: 0.9rem;
+}
+
+.breadcrumb a {
+  color: var(--text-body, #4f4a44);
+  text-underline-offset: 0.18em;
 }
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 0.75fr);
-  gap: clamp(2rem, 5vw, 5rem);
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.9fr);
+  gap: clamp(2rem, 6vw, 7rem);
+  align-items: end;
   padding-block: clamp(2.5rem, 6vw, 5rem);
-  border-bottom: 1px solid var(--color-border, #c9c1b4);
+  border-bottom: 1px solid var(--line, #d8d1c8);
+}
+
+.identity {
+  min-width: 0;
 }
 
 .eyebrow,
 .kicker {
   margin: 0;
-  font-size: 0.78rem;
+  color: var(--text-muted, #78716a);
+  font-size: var(--text-label, 0.75rem);
+  font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .hero h1 {
-  margin: 0.5rem 0 1rem;
-  max-width: 14ch;
-  font-family: var(--font-display), serif;
-  font-size: clamp(2.8rem, 7vw, 6.5rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  max-width: 12ch;
+  margin: var(--space-2, 0.5rem) 0 var(--space-4, 1rem);
+  color: var(--text-strong, #151412);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(3.5rem, 7vw, 6.5rem);
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
   overflow-wrap: anywhere;
 }
 
 .summary {
-  max-width: 46rem;
+  max-width: 50ch;
+  margin: 0;
+  color: var(--text-body, #4f4a44);
   font-size: clamp(1.05rem, 1.6vw, 1.35rem);
   line-height: 1.55;
 }
 
-.sidebar {
+.preview {
+  position: relative;
   display: grid;
-  gap: 1.5rem;
-  padding: 1.25rem;
-  border: 1px solid var(--color-border, #c9c1b4);
-}
-
-.facts {
-  display: grid;
-  gap: 0;
+  min-width: 0;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  place-items: center;
   margin: 0;
+  border: 1px solid var(--line, #d8d1c8);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 0 48%,
+      rgb(21 20 18 / 0.035) 48% 52%,
+      transparent 52%
+    ),
+    var(--surface-muted, #f5f0ea);
 }
 
-.facts div {
+.previewMark {
   display: grid;
-  grid-template-columns: minmax(7rem, 0.8fr) minmax(0, 1.2fr);
-  gap: 1rem;
-  padding-block: 0.85rem;
-  border-bottom: 1px solid var(--color-border, #c9c1b4);
+  z-index: 0;
+  width: clamp(5rem, 25%, 8rem);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid var(--line-strong, #bdb5ab);
+  background: var(--surface, #fffefc);
+  color: var(--text-strong, #151412);
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2.5rem, 6vw, 4.25rem);
+  font-weight: 650;
 }
 
-.facts div:last-child {
-  border-bottom: 0;
+.previewImage {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  object-fit: cover;
 }
 
-.facts dt {
-  font-size: 0.8rem;
-  color: var(--color-text-muted, #6f695f);
+.preview figcaption {
+  position: absolute;
+  z-index: 2;
+  right: var(--space-3, 0.75rem);
+  bottom: var(--space-3, 0.75rem);
+  max-width: calc(100% - 1.5rem);
+  border: 1px solid color-mix(in srgb, var(--line, #d8d1c8) 85%, transparent);
+  background: color-mix(in srgb, var(--surface, #fffefc) 93%, transparent);
+  padding: 0.35rem 0.5rem;
+  color: var(--text-body, #4f4a44);
+  font-size: var(--text-micro, 0.6875rem);
+  line-height: 1.3;
 }
 
-.facts dd {
-  margin: 0;
-  overflow-wrap: anywhere;
+.actions {
+  padding-block: var(--space-6, 1.5rem);
+  border-bottom: 1px solid var(--line, #d8d1c8);
 }
 
-.content {
+.guide {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
-  gap: clamp(2.5rem, 6vw, 6rem);
+  max-width: 54rem;
+  gap: var(--space-10, 2.5rem);
   padding-top: clamp(3rem, 7vw, 6rem);
 }
 
-.sections {
-  display: grid;
-  gap: 3rem;
-}
-
-.section {
-  padding-bottom: 2.5rem;
-  border-bottom: 1px solid var(--color-border, #c9c1b4);
+.section,
+.collectionSection {
+  padding-bottom: var(--space-10, 2.5rem);
+  border-bottom: 1px solid var(--line, #d8d1c8);
 }
 
 .section h2,
-.aside h2 {
-  margin: 0.35rem 0 1rem;
-  font-family: var(--font-display), serif;
+.collectionSection h2 {
+  margin: var(--space-2, 0.5rem) 0 var(--space-5, 1.25rem);
+  color: var(--text-strong, #151412);
+  font-family: var(--font-display), Georgia, serif;
   font-size: clamp(1.8rem, 3vw, 2.7rem);
+  font-weight: 600;
   letter-spacing: -0.025em;
+  line-height: 1;
 }
 
 .list,
 .collectionList {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
   margin: 0;
-  padding-left: 1.2rem;
+  padding: 0;
+  list-style: none;
 }
 
-.list li,
+.list li {
+  position: relative;
+  padding-left: 1.1rem;
+  color: var(--text-body, #4f4a44);
+  line-height: 1.55;
+}
+
+.list li::before {
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 0.45rem;
+  height: 1px;
+  background: var(--accent, #f05217);
+  content: "";
+}
+
+.collectionList {
+  gap: 0;
+  border-top: 1px solid var(--line-subtle, #e5dfd7);
+}
+
 .collectionList li {
-  margin-block: 0.55rem;
+  padding: var(--space-5, 1.25rem) 0;
+  border-bottom: 1px solid var(--line-subtle, #e5dfd7);
+}
+
+.collectionList a {
+  color: var(--text-strong, #151412);
+  font-size: 1.05rem;
+  font-weight: 650;
+  text-underline-offset: 0.18em;
+}
+
+.collectionList p {
+  max-width: 62ch;
+  margin: var(--space-2, 0.5rem) 0 0;
+  color: var(--text-body, #4f4a44);
+  line-height: 1.5;
 }
 
 .emptyNote {
-  max-width: 44rem;
-  color: var(--color-text-muted, #6f695f);
-}
-
-.aside {
-  align-self: start;
-  padding: 1.25rem;
-  border: 1px solid var(--color-border, #c9c1b4);
+  max-width: 58ch;
+  margin: 0;
+  color: var(--text-muted, #78716a);
+  line-height: 1.55;
 }
 
 @media (max-width: 820px) {
-  .hero,
-  .content {
+  .hero {
     grid-template-columns: minmax(0, 1fr);
+    align-items: start;
   }
 
   .hero h1 {
     max-width: none;
   }
+
+  .preview {
+    max-width: 44rem;
+  }
 }
 
-@media (max-width: 480px) {
-  .facts div {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.3rem;
+@media (max-width: 420px) {
+  .page {
+    padding-top: var(--space-5, 1.25rem);
+  }
+
+  .hero {
+    gap: var(--space-8, 2rem);
+    padding-block: var(--space-8, 2rem);
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 18vw, 4rem);
+  }
+
+  .preview figcaption {
+    left: var(--space-2, 0.5rem);
+    right: auto;
+    bottom: var(--space-2, 0.5rem);
   }
 }
