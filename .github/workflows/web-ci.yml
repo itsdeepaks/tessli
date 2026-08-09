@@ -98,11 +98,21 @@ jobs:
           }
           trap cleanup EXIT
 
-          curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 1 \
-            http://127.0.0.1:3000/resources > /tmp/tessli-resources.html
+          server_ready=false
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/resources > /tmp/tessli-resources.html; then
+              server_ready=true
+              break
+            fi
+            sleep 1
+          done
+          if [ "$server_ready" != "true" ]; then
+            cat /tmp/tessli-next.log
+            exit 1
+          fi
           grep -q "What are you trying to design?" /tmp/tessli-resources.html
           grep -q 'data-browse-view="cards"' /tmp/tessli-resources.html
-          grep -q "Inspect Tessli profile" /tmp/tessli-resources.html
+          grep -q 'data-resource-inspect=' /tmp/tessli-resources.html
 
           curl --fail --silent --show-error \
             http://127.0.0.1:3000/resources/designindex > /tmp/tessli-profile.html
@@ -130,6 +140,7 @@ jobs:
           node tests/explore-search-browser.mjs 2>&1 | tee artifacts/search-browser/interaction.log
           node tests/home-task-entry-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/resource-card-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
+          node tests/card-surface-parity-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/collections-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/full-reference-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/saved-resources-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log

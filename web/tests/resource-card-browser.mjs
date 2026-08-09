@@ -4,6 +4,7 @@ const endpoint = process.env.CDP_ENDPOINT ?? "http://127.0.0.1:9222";
 const pageUrl =
   process.env.TESSLI_RESOURCE_CARD_URL ??
   "http://127.0.0.1:3000/lab/resource-cards";
+const browseUrl = new URL("/resources", pageUrl).href;
 const pending = new Map();
 let messageId = 0;
 
@@ -195,7 +196,7 @@ assert.equal(
     `document.querySelectorAll('[data-resource-card] > a[target="_blank"][rel="noopener noreferrer"]').length`,
   ),
   12,
-  "Every card should expose one protected native external link.",
+  "The profile-less lab fixtures should retain their protected native external links.",
 );
 
 await revealCard("land-book");
@@ -273,7 +274,54 @@ assert.equal(
   "The pilot route must not overflow horizontally.",
 );
 
+await send("Page.navigate", { url: browseUrl });
+await waitFor(
+  'document.readyState === "complete" && document.querySelectorAll("[data-browse-view=cards] [data-resource-card]").length > 0',
+  "profile-linked Browse cards",
+);
+
+assert.equal(
+  await evaluate(`(() => {
+    const cards = Array.from(
+      document.querySelectorAll('[data-browse-view=cards] [data-resource-card]'),
+    );
+
+    return cards.every((card) => {
+      const inspect = card.querySelector('a[data-resource-inspect]');
+      const primary = card.querySelector(':scope > a[data-resource-profile-link]');
+      const save = card.querySelector('button[data-resource-save]');
+      const visit = card.querySelector('a[data-resource-visit]');
+      const unavailable = card.getAttribute('data-resource-status') === 'unavailable';
+      const independentActions = unavailable
+        ? !visit && /Provider unavailable/.test(card.textContent)
+        : visit?.getAttribute('target') === '_blank' &&
+          visit?.getAttribute('rel') === 'noopener noreferrer';
+
+      return Boolean(
+        inspect &&
+          primary?.getAttribute('href')?.startsWith('/resources/') &&
+          !primary.hasAttribute('target') &&
+          save &&
+          independentActions &&
+          !card.querySelector('a a, a button, button a, button button'),
+      );
+    });
+  })()`),
+  true,
+  "Every profile-linked Browse card should keep Inspect, Visit, and Save as independent controls.",
+);
+
+assert.equal(
+  await evaluate(`(() => {
+    const inspect = document.querySelector('[data-browse-view=cards] a[data-resource-inspect]');
+    inspect?.focus();
+    return document.activeElement === inspect && inspect.closest('[data-resource-card]')?.matches(':focus-within');
+  })()`),
+  true,
+  "The explicit Inspect action should be keyboard-focusable.",
+);
+
 socket.close();
 console.log(
-  "Resource card hover, fallback, save, and native-link checks passed.",
+  "Resource card hover, fallback, save, and independent-action checks passed.",
 );

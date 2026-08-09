@@ -11,7 +11,7 @@ async function read(relativePath) {
   return readFile(path.join(webRoot, relativePath), "utf8");
 }
 
-test("resource card keeps provider navigation native and supports internal profiles", async () => {
+test("resource card exposes independent profile, visit, and save actions", async () => {
   const component = await read("components/resource-card/resource-card.tsx");
   const anchorClose = component.indexOf("</a>");
   const saveButton = component.indexOf("<button", anchorClose);
@@ -21,7 +21,10 @@ test("resource card keeps provider navigation native and supports internal profi
   assert.match(component, /aria-labelledby=\{titleId\}/);
   assert.match(component, /aria-describedby=\{descriptionId\}/);
   assert.match(component, /target=\{opensExternal \? "_blank" : undefined\}/);
-  assert.match(component, /rel="noopener noreferrer"/);
+  assert.match(
+    component,
+    /rel=\{opensExternal \? "noopener noreferrer" : undefined\}/,
+  );
   assert.ok(anchorClose > 0 && saveButton > anchorClose);
   assert.match(component, /saved\?: boolean/);
   assert.match(component, /onSavedChange\?:/);
@@ -30,8 +33,18 @@ test("resource card keeps provider navigation native and supports internal profi
   assert.match(component, /data-resource-save=\{resource\.id\}/);
   assert.match(component, /profileHref\?: string/);
   assert.match(component, /data-resource-primary-link/);
-  assert.match(component, /Inspect Tessli profile/);
-  assert.match(component, /Visit source ↗/);
+  assert.match(component, /data-resource-profile-link/);
+  assert.match(component, /data-resource-inspect=\{resource\.id\}/);
+  assert.match(
+    component,
+    /aria-label=\{`Inspect \$\{resource\.name\} on Tessli`\}/,
+  );
+  assert.match(component, /href=\{internalProfileHref\}/);
+  assert.match(component, /data-resource-visit=\{resource\.id\}/);
+  assert.match(component, /href=\{resource\.url\}/);
+  assert.match(component, /target="_blank"/);
+  assert.match(component, /rel="noopener noreferrer"/);
+  assert.match(component, /Provider unavailable/);
   assert.match(component, /onSavedChange\(resource\.id, !saved\)/);
   assert.doesNotMatch(component, /window\.open|router\.push|preventDefault/);
 });
@@ -78,6 +91,14 @@ test("resource card geometry survives long copy and restores restrained hover mo
   assert.match(css, /\.footer\s*\{[\s\S]*?margin-top: auto/);
   assert.match(css, /min-width: 44px/);
   assert.match(css, /min-height: 44px/);
+  assert.match(
+    css,
+    /\.profileAction\s*\{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/,
+  );
+  assert.match(
+    css,
+    /\.profileAction a,[\s\S]*?\.unavailableAction\s*\{[\s\S]*?min-height: 44px/,
+  );
   assert.match(css, /\.card::before/);
   assert.match(css, /transition: background-size var\(--motion-fast\)/);
   assert.match(css, /\.card:hover,\s*\.card:focus-within/);
