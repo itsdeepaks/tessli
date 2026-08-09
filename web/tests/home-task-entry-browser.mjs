@@ -31,7 +31,6 @@ await new Promise((resolve, reject) => {
   socket.addEventListener("open", resolve, { once: true });
   socket.addEventListener("error", reject, { once: true });
 });
-
 socket.addEventListener("message", (event) => {
   const message = JSON.parse(event.data);
   const request = pending.get(message.id);
@@ -73,55 +72,29 @@ await send("Page.enable");
 await send("Runtime.enable");
 await send("Page.navigate", { url: `${origin}/` });
 await waitFor(
-  `document.readyState === "complete" && document.querySelector('[data-explore-results]')?.getAttribute('data-result-count') === '12'`,
-  "bounded homepage preview",
+  `document.readyState === "complete" && Boolean(document.querySelector('[data-home-task-entry]'))`,
+  "Home task entry",
 );
 
-const previewAudit = await evaluate(`(() => ({
-  total: Number(document.querySelector('[data-explore-results]')?.getAttribute('data-total-resource-count')),
-  results: Number(document.querySelector('[data-explore-results]')?.getAttribute('data-result-count')),
-  visible: Number(document.querySelector('[data-explore-results]')?.getAttribute('data-visible-result-count')),
-  cards: document.querySelectorAll('[data-resource-grid] > li').length,
-  saves: document.querySelectorAll('[data-resource-grid] [data-resource-save]').length,
-  profileLinks: document.querySelectorAll('[data-resource-grid] [data-resource-primary-link="profile"]').length,
-  firstPrimaryHref: document.querySelector('[data-resource-grid] [data-resource-card] > a')?.getAttribute('href'),
-  providerLinks: document.querySelectorAll('[data-resource-grid] [data-resource-card] a[target="_blank"]').length,
-  browseAllHref: document.querySelector('[data-browse-all-resources] a')?.getAttribute('href'),
-  hasLoadMore: Boolean(document.querySelector('[data-load-more-resources]')),
+const audit = await evaluate(`(() => ({
+  taskLinks: document.querySelectorAll('[data-home-task-entry] a[href^="/resources?q="]').length,
+  collections: document.querySelectorAll('[data-home-task-entry] [data-collection-card]').length,
+  forAiHref: document.querySelector('[data-home-task-entry] a[href="/for-ai"]')?.getAttribute('href'),
+  hasPreview: Boolean(document.querySelector('[data-resource-grid]')),
+  hasCategoryControls: Boolean(document.querySelector('[data-discovery-category]')),
   searchAction: document.querySelector('form[aria-label="Search Tessli resources"]')?.getAttribute('action'),
   searchName: document.querySelector('[data-explore-search-input]')?.getAttribute('name'),
   overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
 }))()`);
 
-assert.equal(previewAudit.total, 295);
-assert.equal(previewAudit.results, 12);
-assert.equal(previewAudit.visible, 12);
-assert.equal(previewAudit.cards, 12);
-assert.equal(previewAudit.saves, 12);
-assert.equal(previewAudit.profileLinks, 12);
-assert.equal(previewAudit.firstPrimaryHref, "/resources/designindex");
-assert.equal(previewAudit.providerLinks, 12);
-assert.equal(previewAudit.browseAllHref, "/resources");
-assert.equal(previewAudit.hasLoadMore, false);
-assert.equal(previewAudit.searchAction, "/resources");
-assert.equal(previewAudit.searchName, "q");
-assert.equal(previewAudit.overflow, false);
-
-await evaluate(`(() => {
-  const button = document.querySelector('[data-resource-save]');
-  localStorage.clear();
-  button?.click();
-})()`);
-await waitFor(
-  `document.querySelector('[data-resource-save]')?.getAttribute('aria-pressed') === 'true'`,
-  "homepage preview save",
-);
-assert.equal(
-  await evaluate(
-    `JSON.parse(localStorage.getItem('tessli-saved-resource-ids-v2') ?? '[]').length`,
-  ),
-  1,
-);
+assert.equal(audit.taskLinks, 6);
+assert.equal(audit.collections, 3);
+assert.equal(audit.forAiHref, "/for-ai");
+assert.equal(audit.hasPreview, false);
+assert.equal(audit.hasCategoryControls, false);
+assert.equal(audit.searchAction, "/resources");
+assert.equal(audit.searchName, "q");
+assert.equal(audit.overflow, false);
 
 socket.close();
-console.log("Bounded homepage preview browser checks passed.");
+console.log("Home task entry browser checks passed.");

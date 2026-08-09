@@ -134,7 +134,7 @@ for (const check of machineRouteChecks) {
 }
 
 const visualCases = [
-  { name: "explore", path: "/", selector: "[data-explore-results=ready]" },
+  { name: "home", path: "/", selector: "[data-home-task-entry]" },
   {
     name: "collections",
     path: "/collections",

@@ -11,12 +11,17 @@ async function read(relativePath) {
   return readFile(path.join(webRoot, relativePath), "utf8");
 }
 
-test("Explore page delegates to the scoped discovery experience", async () => {
+test("Home preserves the existing hero and delegates its new content below the fold", async () => {
   const page = await read("app/page.tsx");
 
-  assert.match(page, /<ExploreExperience/);
+  assert.match(page, /import \{ ExploreHero \}/);
+  assert.match(page, /<ExploreHero \/>/);
+  assert.match(page, /<HomeTaskEntry/);
   assert.match(page, /id="main-content"/);
-  assert.doesNotMatch(page, /application foundation/i);
+  assert.doesNotMatch(
+    page,
+    /ExploreExperience|DiscoveryControls|ExploreResults/,
+  );
 });
 
 test("Explore hero composes approved copy, controlled search, facts, and artwork", async () => {

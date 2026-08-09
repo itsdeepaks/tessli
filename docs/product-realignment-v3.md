@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.4 — Canonical Browse focus**
+Next implementation slice: **V3.6 — Resource-card consistency**
 
 ## 1. Product definition
 
@@ -153,6 +153,8 @@ Order:
 7. footer.
 
 Do not render a second catalogue, category scroller, sorting, filters, More menu, coverage dashboard, fake usage metrics, or unfinished actions.
+
+The existing Home hero is a preserved product asset. V3.5 may change only the content below it; its copy, artwork, layout, and search interaction stay unchanged.
 
 ### 7.2 Browse
 
@@ -430,4 +432,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.4 Canonical Browse focus**. It makes `/resources` task-first, keeps its URL state and card actions truthful, and leaves Home and shared-card consistency to their later dedicated slices.
+Start **V3.6 Resource-card consistency**. It aligns preview, Inspect, Save, and Visit across Browse, Collections, and Saved without changing Home, Browse retrieval, or source-guide content.
