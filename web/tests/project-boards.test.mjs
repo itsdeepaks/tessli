@@ -85,6 +85,8 @@ test("Board export is labelled, local-only, and validation-aware", async () => {
     "Generated date",
     "Copy Markdown",
     "Download .md",
+    "Copy JSON",
+    "Download .json",
     "Complete these requirements before exporting",
   ]) {
     assert.match(controls, new RegExp(phrase.replaceAll(".", "\\."), "i"));
@@ -95,6 +97,15 @@ test("Board export is labelled, local-only, and validation-aware", async () => {
   );
   assert.match(controls, /aria-live="polite"/);
   assert.match(controls, /disabled={!result\.ok}/);
+  assert.match(controls, /createBoardAgentHandoff/);
+  assert.match(controls, /navigator\.clipboard\.writeText\(handoff\.json\)/);
+  assert.match(controls, /new Blob\(\[handoff\.json\]/);
+  assert.match(controls, /explicitly paste\s+or\s+attach it to the agent/i);
+  assert.match(
+    controls,
+    /local MCP do not read this\s+browser Board automatically/i,
+  );
+  assert.match(controls, /\{handoff\.ok \? \(/);
 });
 
 test("boards route uses canonical source profiles and remains local-navigation only", async () => {

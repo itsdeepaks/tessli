@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.13 — Board agent handoff**
+Next implementation slice: **V3.14 — For AI redesign**
 
 ## 1. Product definition
 
@@ -432,4 +432,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.13 Board agent handoff**. It adds compact local JSON alongside the existing deterministic Markdown and documents model-neutral use without exposing Board data automatically.
+Start **V3.14 For AI redesign**. It explains the real human-to-agent workflow, supported local setup, and explicit handoff boundaries without leading with a tool inventory or verification mechanics.

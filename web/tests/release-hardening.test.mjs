@@ -224,7 +224,7 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.13 Board agent handoff NEXT\*\*/,
+    /Status: \*\*active delivery plan — V3\.14 For AI redesign NEXT\*\*/,
   );
   assert.match(
     slices,
@@ -268,7 +268,11 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    tableRow("V3.13", "Board agent handoff", "NEXT", "V3.12"),
+    tableRow("V3.13", "Board agent handoff", "DONE", "V3.12"),
+  );
+  assert.match(
+    slices,
+    tableRow("V3.14", "For AI redesign", "NEXT", "V3.8–V3.10, V3.13"),
   );
   assert.match(slices, /## 7\. Historical V2 phase status/);
   assert.match(
@@ -345,16 +349,16 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.13 Board agent handoff\*\*/,
+    /V3\.0 replaced this continuation boundary\. The next repository slice is \*\*V3\.14 For AI redesign\*\*/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
   assert.match(
     readme,
-    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, V3\.9 compact public machine representations, V3\.10 machine discovery, V3\.11 Collections as research paths, and V3\.12 Saved-to-Board flow are complete\./,
+    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, V3\.9 compact public machine representations, V3\.10 machine discovery, V3\.11 Collections as research paths, V3\.12 Saved-to-Board flow, and V3\.13 Board agent handoff are complete\./,
   );
   assert.match(
     readme,
-    /next independently reviewable slice is \*\*V3\.13 — Board agent handoff\*\*/i,
+    /next independently reviewable slice is \*\*V3\.14 — For AI redesign\*\*/i,
   );
   assert.match(
     slices,

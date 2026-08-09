@@ -6,6 +6,7 @@ import {
   createBoardResearchPack,
   type BoardResearchPackSource,
 } from "@/lib/board-research-pack.mjs";
+import { createBoardAgentHandoff } from "@/lib/board-agent-handoff.mjs";
 import type { ProjectBoard } from "./board-store";
 import styles from "./board-export-controls.module.css";
 
@@ -35,6 +36,16 @@ export function BoardExportControls({ board, resources }: Props) {
   const result = useMemo(
     () =>
       createBoardResearchPack({
+        contractVersion: 1,
+        generatedAt,
+        board,
+        sources: resources,
+      }),
+    [board, generatedAt, resources],
+  );
+  const handoff = useMemo(
+    () =>
+      createBoardAgentHandoff({
         contractVersion: 1,
         generatedAt,
         board,
@@ -77,6 +88,36 @@ export function BoardExportControls({ board, resources }: Props) {
     announce(`${result.filename} downloaded.`);
   };
 
+  const copyJson = async () => {
+    if (!handoff.ok) return;
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard access is unavailable.");
+      }
+      await navigator.clipboard.writeText(handoff.json);
+      announce("Agent handoff copied as JSON.");
+    } catch {
+      announce("Copy failed. Download the JSON file instead.");
+    }
+  };
+
+  const downloadJson = () => {
+    if (!handoff.ok) return;
+    const blob = new Blob([handoff.json], {
+      type: "application/json;charset=utf-8",
+    });
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = handoff.filename;
+    anchor.hidden = true;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+    announce(`${handoff.filename} downloaded.`);
+  };
+
   return (
     <section
       className={styles.exportPanel}
@@ -103,7 +144,10 @@ export function BoardExportControls({ board, resources }: Props) {
 
       {!result.ok ? (
         <div className={styles.validation} role="status">
-          <strong>Complete these requirements before exporting:</strong>
+          <strong>
+            Complete these requirements before exporting or creating a compact
+            JSON handoff:
+          </strong>
           <ul>
             {result.errors.map((error) => (
               <li key={error}>{error}</li>
@@ -118,6 +162,17 @@ export function BoardExportControls({ board, resources }: Props) {
         </p>
       )}
 
+      {result.ok && !handoff.ok ? (
+        <div className={styles.validation} role="status">
+          <strong>Compact JSON handoff is unavailable:</strong>
+          <ul>
+            {handoff.errors.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       <div className={styles.actions}>
         <button disabled={!result.ok} onClick={copyMarkdown} type="button">
           Copy Markdown
@@ -125,7 +180,23 @@ export function BoardExportControls({ board, resources }: Props) {
         <button disabled={!result.ok} onClick={downloadMarkdown} type="button">
           Download .md
         </button>
+        {handoff.ok ? (
+          <>
+            <button onClick={copyJson} type="button">
+              Copy JSON
+            </button>
+            <button onClick={downloadJson} type="button">
+              Download .json
+            </button>
+          </>
+        ) : null}
       </div>
+
+      <p className={styles.recipe}>
+        To use this with an agent, copy or download it, then explicitly paste or
+        attach it to the agent. Tessli and the local MCP do not read this
+        browser Board automatically. Board data is not uploaded or synced.
+      </p>
 
       <p className={styles.status} aria-live="polite">
         {status?.signature === resultSignature ? status.message : ""}
