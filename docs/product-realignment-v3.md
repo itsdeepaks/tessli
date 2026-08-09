@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.8 — Local MCP v2**
+Next implementation slice: **V3.9 — Public machine representations v2**
 
 ## 1. Product definition
 
@@ -285,7 +285,7 @@ get_collection
 create_research_brief
 ```
 
-Existing tool names remain temporary compatibility aliases during migration. `verify_resource` moves out of the normal agent workflow. MCP must not read browser-local Boards, browse external providers, proxy private content, or write Tessli state.
+The v1 tool list is not registered as MCP aliases because every registered stdio tool is necessarily public through `ListTools`; the five-tool contract is the normal and only advertised MCP surface. `verify_resource` moves out of the normal agent workflow. MCP must not read browser-local Boards, browse external providers, proxy private content, or write Tessli state.
 
 Remote Streamable HTTP MCP follows only after task retrieval and compact outputs are stable locally.
 
@@ -432,4 +432,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.8 Local MCP v2**. It replaces the normal local agent workflow with five focused read-only capabilities backed by the completed deterministic task retrieval contract.
+Start **V3.9 Public machine representations v2**. It makes the same task-fit source guidance compact and actionable through canonical public JSON and Markdown.

@@ -42,11 +42,11 @@ Authentication, cloud workspaces, submissions, moderation, large pattern catalog
 
 ## Active V3 execution loop
 
-V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, and V3.7 deterministic task retrieval are complete. The next independently reviewable slice is **V3.8 — Local MCP v2**.
+V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, and V3.8 local MCP v2 are complete. The next independently reviewable slice is **V3.9 — Public machine representations v2**.
 
 ```text
-V3.8 Local MCP v2
-→ V3.9 Public machine representations v2
+V3.9 Public machine representations v2
+→ V3.10 Machine discovery
 ```
 
 Machine work follows the stable source-guide contract:
@@ -92,17 +92,15 @@ Tessli supports stable semantic source pages, deterministic Board research packs
 
 ### With MCP
 
-The repository currently contains seven read-only local-MCP-v1 tools:
+The repository currently contains five read-only local-MCP-v2 tools:
 
-- `search_resources`;
-- `get_resource_profile`;
-- `compare_resources`;
+- `find_sources`;
+- `get_source`;
+- `find_alternatives`;
 - `get_collection`;
-- `build_research_plan`;
-- `create_reference_packet`;
-- `verify_resource`.
+- `create_research_brief`.
 
-V3.8 will migrate the normal workflow to task retrieval, source guidance, alternatives, Collections, and research briefs. A hosted remote MCP does not exist yet; it is deferred to V3.16 after the local contract is stable.
+These tools use deterministic task retrieval, source guidance, alternatives, Collections, and research briefs. A hosted remote MCP does not exist yet; it is deferred to V3.16 after the local contract is stable.
 
 ## Boundaries
 

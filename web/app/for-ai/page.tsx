@@ -18,7 +18,7 @@ import styles from "./for-ai.module.css";
 export const metadata = {
   title: "For AI",
   description:
-    "Use Tessli through semantic pages, JSON and Markdown representations, browser-local research packs, or seven read-only local MCP tools.",
+    "Use Tessli through semantic pages, JSON and Markdown representations, browser-local research packs, or five read-only local MCP tools.",
 };
 
 const repositoryUrl = "https://github.com/itsdeepaks/tessli";
@@ -67,8 +67,9 @@ export default function ForAiPage() {
             <p className={styles.lede}>
               Tessli exposes the same repository-backed source truth through
               semantic pages, JSON and Markdown representations, local research
-              packs, and seven read-only MCP tools. Retrieval helps models find
-              relevant context; it does not by itself create design taste.
+              packs, and {TESSLI_MCP_TOOL_CATALOGUE.length} read-only MCP tools.
+              Retrieval helps models find relevant context; it does not by
+              itself create design taste.
             </p>
             <div className={styles.heroActions}>
               <Link className={styles.primaryAction} href="#mcp-setup">
@@ -142,18 +143,24 @@ export default function ForAiPage() {
               <h3>With local MCP</h3>
               <p>
                 Run Tessli&apos;s repository-backed stdio server locally and let
-                an MCP client call the seven bounded tools directly.
+                an MCP client call the {TESSLI_MCP_TOOL_CATALOGUE.length}{" "}
+                focused tools directly.
               </p>
               <ol>
-                <li>Search, inspect, and compare exact Tessli sources.</li>
-                <li>Retrieve a published Playbook in editorial order.</li>
                 <li>
-                  Build a research plan, create a reference packet, and report
-                  repository-recorded verification state.
+                  Find a bounded task-fit source set and inspect a source guide.
+                </li>
+                <li>
+                  Compare differentiated alternatives or a published Collection.
+                </li>
+                <li>
+                  Create a compact research brief from the same recorded source
+                  truth.
                 </li>
               </ol>
               <a href="#mcp-tools">
-                Review the seven tools <span aria-hidden="true">↓</span>
+                Review the {TESSLI_MCP_TOOL_CATALOGUE.length} tools{" "}
+                <span aria-hidden="true">↓</span>
               </a>
             </article>
           </div>

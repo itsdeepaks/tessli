@@ -9,28 +9,22 @@ import {
   getTessliMcpToolMetadata,
 } from "../lib/mcp-tool-catalogue.ts";
 import {
-  NATIVE_ACCESS_VALUES,
-  NATIVE_CATEGORY_IDS,
   NATIVE_MCP_LIMITS,
   NativeMcpInputError,
-  buildNativeResearchPlan,
-  compareNativeResources,
-  createNativeReferencePacket,
+  createNativeResearchBrief,
+  findNativeAlternatives,
+  findNativeSources,
   getNativeCollection,
-  getNativeResourceProfile,
-  searchNativeResources,
-  verifyNativeResource,
+  getNativeSource,
 } from "../lib/mcp-native-tools.ts";
 
 export { TESSLI_MCP_TOOL_NAMES };
 
-const searchResourcesTool = getTessliMcpToolMetadata("search_resources");
-const resourceProfileTool = getTessliMcpToolMetadata("get_resource_profile");
-const compareResourcesTool = getTessliMcpToolMetadata("compare_resources");
+const findSourcesTool = getTessliMcpToolMetadata("find_sources");
+const sourceTool = getTessliMcpToolMetadata("get_source");
+const alternativesTool = getTessliMcpToolMetadata("find_alternatives");
 const collectionTool = getTessliMcpToolMetadata("get_collection");
-const researchPlanTool = getTessliMcpToolMetadata("build_research_plan");
-const referencePacketTool = getTessliMcpToolMetadata("create_reference_packet");
-const verificationTool = getTessliMcpToolMetadata("verify_resource");
+const researchBriefTool = getTessliMcpToolMetadata("create_research_brief");
 
 const readOnlyAnnotations = Object.freeze({
   readOnlyHint: true,
@@ -44,25 +38,34 @@ const identifierSchema = z
   .trim()
   .min(1)
   .max(160)
-  .describe("Exact Tessli resource or collection stable ID or slug.");
+  .describe("Exact Tessli source or collection stable ID or slug.");
 
-const taskNameSchema = z
-  .string()
-  .trim()
-  .min(1)
-  .max(160)
-  .describe("Short name for the target design or implementation task.");
+const optionalTaskTextSchema = z.string().trim().min(1).max(160).optional();
 
-const generatedAtSchema = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/u)
-  .optional()
-  .describe("Optional deterministic YYYY-MM-DD packet date.");
-
-const filterListSchema = z
-  .array(z.string().trim().min(1).max(100))
-  .max(10)
-  .optional();
+const taskInputSchema = {
+  task: z
+    .string()
+    .trim()
+    .min(1)
+    .max(240)
+    .describe("The design or frontend task to research."),
+  surface: optionalTaskTextSchema.describe(
+    "Optional target surface, such as a landing page or settings form.",
+  ),
+  framework: optionalTaskTextSchema.describe(
+    "Optional framework or platform constraint.",
+  ),
+  needs: z
+    .array(z.string().trim().min(1).max(120))
+    .max(8)
+    .optional()
+    .describe("Optional recorded capabilities or materials the task needs."),
+  exclusions: z
+    .array(z.string().trim().min(1).max(120))
+    .max(8)
+    .optional()
+    .describe("Optional recorded metadata to exclude from the shortlist."),
+};
 
 const structuredOutputSchema = {
   result: z.record(z.string(), z.unknown()),
@@ -114,50 +117,22 @@ export function createTessliMcpServer(): McpServer {
     },
     {
       instructions:
-        "Use Tessli to select and compare design resources, inspect repository-recorded evidence, and create original research handoffs. This server is read-only and repository-backed. It performs no live website verification, provider call, screenshot retrieval, project-code ingestion, account access, or write operation.",
+        "Use Tessli to retrieve task-fit design sources, inspect recorded source guidance, compare differentiated alternatives, review collections, and create compact research briefs. This server is local, read-only, and repository-backed. It performs no provider browsing or verification, browser-local Board access, credential access, project-code ingestion, or write operation.",
     },
   );
 
   server.registerTool(
-    searchResourcesTool.name,
+    findSourcesTool.name,
     {
-      title: searchResourcesTool.title,
-      description: searchResourcesTool.description,
-      inputSchema: {
-        query: z.string().trim().max(200).optional(),
-        category: z
-          .string()
-          .trim()
-          .refine(
-            (value) => NATIVE_CATEGORY_IDS.includes(value),
-            "Unknown Tessli category.",
-          )
-          .optional(),
-        access: z
-          .string()
-          .trim()
-          .refine(
-            (value) => NATIVE_ACCESS_VALUES.includes(value),
-            "Unknown Tessli access value.",
-          )
-          .optional(),
-        capabilities: filterListSchema,
-        frameworks: filterListSchema,
-        integrationMethods: filterListSchema,
-        workflowFit: filterListSchema,
-        limit: z
-          .number()
-          .int()
-          .min(1)
-          .max(NATIVE_MCP_LIMITS.searchResults)
-          .default(10),
-      },
+      title: findSourcesTool.title,
+      description: findSourcesTool.description,
+      inputSchema: taskInputSchema,
       outputSchema: structuredOutputSchema,
       annotations: readOnlyAnnotations,
     },
     async (input) => {
       try {
-        return toSuccessResult(searchNativeResources(input));
+        return toSuccessResult(findNativeSources(input));
       } catch (error) {
         return toErrorResult(error);
       }
@@ -165,17 +140,17 @@ export function createTessliMcpServer(): McpServer {
   );
 
   server.registerTool(
-    resourceProfileTool.name,
+    sourceTool.name,
     {
-      title: resourceProfileTool.title,
-      description: resourceProfileTool.description,
+      title: sourceTool.title,
+      description: sourceTool.description,
       inputSchema: { identifier: identifierSchema },
       outputSchema: structuredOutputSchema,
       annotations: readOnlyAnnotations,
     },
     async ({ identifier }) => {
       try {
-        return toSuccessResult(getNativeResourceProfile(identifier));
+        return toSuccessResult(getNativeSource(identifier));
       } catch (error) {
         return toErrorResult(error);
       }
@@ -183,22 +158,25 @@ export function createTessliMcpServer(): McpServer {
   );
 
   server.registerTool(
-    compareResourcesTool.name,
+    alternativesTool.name,
     {
-      title: compareResourcesTool.title,
-      description: compareResourcesTool.description,
+      title: alternativesTool.title,
+      description: alternativesTool.description,
       inputSchema: {
-        identifiers: z
-          .array(identifierSchema)
-          .min(2)
-          .max(NATIVE_MCP_LIMITS.comparisonResources),
+        identifier: identifierSchema,
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(NATIVE_MCP_LIMITS.alternatives)
+          .default(NATIVE_MCP_LIMITS.alternatives),
       },
       outputSchema: structuredOutputSchema,
       annotations: readOnlyAnnotations,
     },
-    async ({ identifiers }) => {
+    async ({ identifier, limit }) => {
       try {
-        return toSuccessResult(compareNativeResources(identifiers));
+        return toSuccessResult(findNativeAlternatives(identifier, limit));
       } catch (error) {
         return toErrorResult(error);
       }
@@ -224,67 +202,17 @@ export function createTessliMcpServer(): McpServer {
   );
 
   server.registerTool(
-    researchPlanTool.name,
+    researchBriefTool.name,
     {
-      title: researchPlanTool.title,
-      description: researchPlanTool.description,
-      inputSchema: {
-        taskName: taskNameSchema,
-        identifiers: z
-          .array(identifierSchema)
-          .min(1)
-          .max(NATIVE_MCP_LIMITS.researchResources),
-        generatedAt: generatedAtSchema,
-      },
+      title: researchBriefTool.title,
+      description: researchBriefTool.description,
+      inputSchema: taskInputSchema,
       outputSchema: structuredOutputSchema,
       annotations: readOnlyAnnotations,
     },
     async (input) => {
       try {
-        return toSuccessResult(buildNativeResearchPlan(input));
-      } catch (error) {
-        return toErrorResult(error);
-      }
-    },
-  );
-
-  server.registerTool(
-    referencePacketTool.name,
-    {
-      title: referencePacketTool.title,
-      description: referencePacketTool.description,
-      inputSchema: {
-        taskName: taskNameSchema,
-        identifiers: z
-          .array(identifierSchema)
-          .min(1)
-          .max(NATIVE_MCP_LIMITS.researchResources),
-        generatedAt: generatedAtSchema,
-      },
-      outputSchema: structuredOutputSchema,
-      annotations: readOnlyAnnotations,
-    },
-    async (input) => {
-      try {
-        return toSuccessResult(createNativeReferencePacket(input));
-      } catch (error) {
-        return toErrorResult(error);
-      }
-    },
-  );
-
-  server.registerTool(
-    verificationTool.name,
-    {
-      title: verificationTool.title,
-      description: verificationTool.description,
-      inputSchema: { identifier: identifierSchema },
-      outputSchema: structuredOutputSchema,
-      annotations: readOnlyAnnotations,
-    },
-    async ({ identifier }) => {
-      try {
-        return toSuccessResult(verifyNativeResource(identifier));
+        return toSuccessResult(createNativeResearchBrief(input));
       } catch (error) {
         return toErrorResult(error);
       }
