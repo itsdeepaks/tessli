@@ -10,11 +10,6 @@ import {
   TESSLI_MCP_TOOL_CATALOGUE,
   TESSLI_MCP_TOOL_NAMES,
 } from "../lib/mcp-tool-catalogue.ts";
-import {
-  SOURCE_FRESHNESS_WINDOWS,
-  deriveFreshnessStatus,
-  getSourceContractSummary,
-} from "../lib/source-profiles.ts";
 
 const currentFile = fileURLToPath(import.meta.url);
 const webRoot = path.resolve(path.dirname(currentFile), "..");
@@ -62,51 +57,46 @@ test("MCP server consumes shared names and descriptions without expanding scope"
   assert.doesNotMatch(server, /Http|SSE|OAuth|\.listen\s*\(/);
 });
 
-test("For AI page exposes truthful model paths, representations, and boundaries", async () => {
+test("For AI page leads with the task-to-agent workflow and current access truth", async () => {
   const page = await read("app/for-ai/page.tsx");
 
   assert.match(page, /title: "For AI"/);
   assert.match(page, /data-for-ai-page/);
   assert.match(page, /id="main-content"/);
-  assert.match(page, /Give models structured design research/);
-  assert.match(page, /Without MCP/);
-  assert.match(page, /With local MCP/);
+  assert.match(page, /data-for-ai-workflow/);
+  assert.match(page, /data-for-ai-example/);
+  assert.match(page, /data-for-ai-representations/);
+  assert.match(page, /data-for-ai-board-boundary/);
+  assert.match(page, /data-for-ai-local-mcp/);
+  assert.match(page, /data-for-ai-remote-status="unavailable"/);
+  assert.match(page, /data-for-ai-access-routes/);
+  assert.match(page, /data-for-ai-boundaries/);
+  assert.match(page, /Turn research into an agent’s next clear move./);
+  assert.match(page, /From task to reviewed implementation./);
+  assert.match(page, /What an agent receives/);
+  assert.match(page, /A concrete task, kept compact/);
+  assert.match(page, /Access without MCP/);
+  assert.match(page, /Local MCP is the current transport./);
+  assert.match(page, /Choose the recorded access route./);
+  assert.match(
+    page,
+    /Keep project context private and provider boundaries clear/,
+  );
   assert.match(page, /npm run mcp/);
-  assert.match(page, /TESSLI_MCP_TOOL_CATALOGUE\.map/);
-  assert.match(page, /getSourceContractSummary\(\)/);
-  assert.match(page, /SOURCE_FRESHNESS_WINDOWS/);
   assert.match(page, /profile\.json/);
   assert.match(page, /profile\.md/);
-  assert.match(page, /collection\.json/);
-  assert.match(page, /collection\.md/);
-  assert.match(page, /tessli\.board-research-pack\.v1/);
-  assert.match(page, /The MCP\s*server does not read private Board storage/);
-  assert.match(page, /No live provider verification/);
-  assert.match(page, /No screenshot or private-library retrieval/);
-  assert.match(page, /No project-code ingestion/);
-  assert.match(page, /No account or credential access/);
-  assert.match(page, /No write operation/);
-  assert.match(page, /Retrieval is not taste/);
-  assert.doesNotMatch(page, /hosted MCP|remote MCP endpoint|AI taste engine/i);
-});
-
-test("For AI coverage and freshness copy derive from executable source truth", () => {
-  const summary = getSourceContractSummary();
-
-  assert.deepEqual(summary.coverageCounts, {
-    listed: 255,
-    profiled: 40,
-    verified: 0,
-  });
-  assert.equal(summary.resourceCount, 295);
-  assert.deepEqual(SOURCE_FRESHNESS_WINDOWS, {
-    currentMaxDays: 90,
-    agingMaxDays: 180,
-  });
-  assert.equal(deriveFreshnessStatus("2026-05-06", "2026-08-04"), "current");
-  assert.equal(deriveFreshnessStatus("2026-05-05", "2026-08-04"), "aging");
-  assert.equal(deriveFreshnessStatus("2026-02-04", "2026-08-04"), "stale");
-  assert.equal(deriveFreshnessStatus(null, "2026-08-04"), "unknown");
+  assert.match(page, /Export their compact Markdown[\s\S]*?JSON/);
+  assert.match(page, /do not read a browser Board[\s\S]*?automatically/);
+  assert.match(page, /Remote and hosted MCP are unavailable today/);
+  assert.match(page, /checked-out repository/);
+  assert.match(page, /read-only/);
+  assert.doesNotMatch(
+    page,
+    /getSourceContractSummary|SOURCE_FRESHNESS_WINDOWS/,
+  );
+  assert.doesNotMatch(page, /coverageGrid|policyGrid|coverageCounts/);
+  assert.doesNotMatch(page, /\b(?:coverage|evidence|verification)\b/i);
+  assert.doesNotMatch(page, /\btaste\b/i);
 });
 
 test("For AI route is discoverable only after its page exists", async () => {
@@ -128,7 +118,6 @@ test("For AI visual contract is route-scoped, responsive, and overflow safe", as
   const css = await read("app/for-ai/for-ai.module.css");
 
   assert.match(css, /\.hero \{/);
-  assert.match(css, /\.toolList \{/);
   assert.match(css, /\.codeBlock \{[\s\S]*?overflow-x: auto/);
   assert.match(css, /@media \(max-width: 980px\)/);
   assert.match(css, /@media \(max-width: 767px\)/);

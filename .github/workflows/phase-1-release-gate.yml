@@ -103,8 +103,10 @@ jobs:
             http://127.0.0.1:3000/ > /tmp/tessli-release-home.html
           curl --fail --silent --show-error \
             http://127.0.0.1:3000/for-ai > /tmp/tessli-release-for-ai.html
-          grep -q "Give models structured design research" /tmp/tessli-release-for-ai.html
-          grep -q "create_research_brief" /tmp/tessli-release-for-ai.html
+          grep -q "From task to reviewed implementation." /tmp/tessli-release-for-ai.html
+          grep -q 'data-for-ai-workflow' /tmp/tessli-release-for-ai.html
+          grep -q 'data-for-ai-remote-status="unavailable"' /tmp/tessli-release-for-ai.html
+          grep -q 'profile.json' /tmp/tessli-release-for-ai.html
 
           chrome_bin="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           test -n "$chrome_bin"

@@ -42,11 +42,11 @@ Authentication, cloud workspaces, submissions, moderation, large pattern catalog
 
 ## Active V3 execution loop
 
-V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, V3.8 local MCP v2, V3.9 compact public machine representations, V3.10 machine discovery, V3.11 Collections as research paths, V3.12 Saved-to-Board flow, and V3.13 Board agent handoff are complete. The next independently reviewable slice is **V3.14 — For AI redesign**.
+V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, V3.8 local MCP v2, V3.9 compact public machine representations, V3.10 machine discovery, V3.11 Collections as research paths, V3.12 Saved-to-Board flow, V3.13 Board agent handoff, and V3.14 For AI redesign are complete. The next slice, **V3.15 — Live-preview pilot**, needs separate approval before it may begin.
 
 ```text
-V3.14 For AI redesign
-→ V3.15 Live-preview pilot (separate approval)
+V3.14 For AI redesign (complete)
+→ V3.15 Live-preview pilot (separate approval required)
 ```
 
 Machine work follows the stable source-guide contract:

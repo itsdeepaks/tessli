@@ -125,7 +125,7 @@ await Promise.all([send("Page.enable"), send("Runtime.enable")]);
 await setViewport(1440, 900, false);
 await navigate(
   "/for-ai",
-  'document.querySelectorAll("[data-for-ai-page] .toolCard").length === 5 || document.querySelectorAll("[data-for-ai-page] ol li code").length >= 5',
+  'Boolean(document.querySelector("[data-for-ai-page] [data-for-ai-workflow]")) && Boolean(document.querySelector("[data-for-ai-remote-status=\\"unavailable\\"]"))',
 );
 
 assert.equal(await evaluate('document.querySelectorAll("main").length'), 1);
@@ -138,13 +138,77 @@ assert.equal(
 );
 assert.equal(
   await evaluate(
-    'Array.from(document.querySelectorAll("#mcp-tools code")).filter((node) => node.textContent?.includes("_")).length',
+    `[
+      "data-for-ai-workflow",
+      "data-for-ai-example",
+      "data-for-ai-representations",
+      "data-for-ai-board-boundary",
+      "data-for-ai-local-mcp",
+      "data-for-ai-access-routes",
+      "data-for-ai-boundaries"
+    ].every((attribute) => Boolean(document.querySelector("[" + attribute + "]")))`,
   ),
-  5,
+  true,
 );
 assert.equal(
   await evaluate(
-    'document.body.textContent.includes("255") && document.body.textContent.includes("40") && document.body.textContent.includes("None currently meet the full contract")',
+    'document.querySelector("[data-for-ai-remote-status]")?.getAttribute("data-for-ai-remote-status")',
+  ),
+  "unavailable",
+);
+assert.equal(
+  await evaluate(
+    "(/remote/i.test(document.body.textContent) && /hosted/i.test(document.body.textContent) && /unavailable/i.test(document.body.textContent))",
+  ),
+  true,
+);
+assert.equal(
+  await evaluate(
+    `[
+      "Turn research into an agent’s next clear move.",
+      "From task to reviewed implementation.",
+      "Guidance with a reason to use it.",
+      "A result a builder can act on.",
+      "Use a source guide or public representation.",
+      "Local MCP is the current transport",
+      "Choose the recorded access route",
+      "Keep project context private and provider boundaries clear"
+    ].every((heading) => Array.from(document.querySelectorAll("h1, h2")).some((node) => node.textContent?.trim() === heading || node.textContent?.trim() === heading + "."))`,
+  ),
+  true,
+);
+assert.equal(
+  await evaluate(
+    `(() => {
+      const page = document.querySelector("[data-for-ai-page]");
+      const steps = [
+        "data-for-ai-workflow",
+        "data-for-ai-example",
+        "data-for-ai-representations",
+        "data-for-ai-local-mcp",
+        "data-for-ai-access-routes",
+        "data-for-ai-boundaries"
+      ].map((attribute) => page.querySelector("[" + attribute + "]"));
+      return steps.every(Boolean) && steps.every((node, index) => index === 0 || steps[index - 1].compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING);
+    })()`,
+  ),
+  true,
+);
+assert.equal(
+  await evaluate(
+    'document.body.textContent.includes("Export their compact Markdown") && document.body.textContent.includes("do not read a browser Board automatically") && document.body.textContent.includes("not uploaded or synced")',
+  ),
+  true,
+);
+assert.equal(
+  await evaluate(
+    '!["Coverage, confidence, freshness", "Evidence confidence", "Recorded freshness", "Retrieval is not taste"].some((copy) => document.body.textContent.includes(copy))',
+  ),
+  true,
+);
+assert.equal(
+  await evaluate(
+    "!/\\b(?:coverage|evidence|verification|taste)\\b/i.test(document.body.textContent)",
   ),
   true,
 );
@@ -162,22 +226,18 @@ assert.equal(
 );
 
 const representationStatuses = await evaluate(`Promise.all([
-  "/resources/landingfolio/profile.json",
-  "/resources/landingfolio/profile.md",
-  "/collections/saas-landing-pages/collection.json",
-  "/collections/saas-landing-pages/collection.md"
-].map(async (pathname) => {
+  ...Array.from(document.querySelectorAll("[data-for-ai-representations] a[href$=\\"/profile.json\\"], [data-for-ai-representations] a[href$=\\"/profile.md\\"]"), (link) => link.getAttribute("href"))
+].filter(Boolean).map(async (pathname) => {
   const response = await fetch(pathname);
   return [pathname, response.status, response.headers.get("content-type")];
 }))`);
+assert.equal(representationStatuses.length, 2);
 assert.deepEqual(
   representationStatuses.map((entry) => entry[1]),
-  [200, 200, 200, 200],
+  [200, 200],
 );
 assert.match(representationStatuses[0][2], /application\/json/);
 assert.match(representationStatuses[1][2], /text\/markdown/);
-assert.match(representationStatuses[2][2], /application\/json/);
-assert.match(representationStatuses[3][2], /text\/markdown/);
 await screenshot("for-ai-1440x900.png");
 
 for (const [width, height, mobile] of [
@@ -195,13 +255,6 @@ for (const [width, height, mobile] of [
     await evaluate("document.documentElement.scrollWidth <= window.innerWidth"),
     true,
     `For AI should not overflow at ${width}px.`,
-  );
-  assert.equal(
-    await evaluate(
-      'getComputedStyle(document.querySelector("#mcp-tools ol")).gridTemplateColumns.split(" ").length',
-    ),
-    width < 768 ? 1 : 2,
-    `Tool list should recompose at ${width}px.`,
   );
   assert.equal(
     await evaluate(
