@@ -130,6 +130,7 @@ jobs:
           node tests/explore-search-browser.mjs 2>&1 | tee artifacts/search-browser/interaction.log
           node tests/home-task-entry-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/resource-card-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
+          node tests/card-surface-parity-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/collections-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/full-reference-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log
           node tests/saved-resources-browser.mjs 2>&1 | tee -a artifacts/search-browser/interaction.log

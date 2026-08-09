@@ -212,9 +212,11 @@ export function ResourceCard({
         aria-describedby={descriptionId}
         aria-labelledby={titleId}
         className={styles.cardLink}
-        data-resource-visit={resource.id}
+        data-resource-profile-link={
+          internalProfileHref ? resource.id : undefined
+        }
         href={primaryHref}
-        rel="noopener noreferrer"
+        rel={opensExternal ? "noopener noreferrer" : undefined}
         target={opensExternal ? "_blank" : undefined}
       >
         <div className={styles.media}>
@@ -280,16 +282,26 @@ export function ResourceCard({
 
       {internalProfileHref ? (
         <div className={styles.profileAction}>
-          <span className={styles.profileLabel}>
-            Inspect Tessli profile <span aria-hidden="true">→</span>
-          </span>
+          <a
+            aria-label={`Inspect ${resource.name} on Tessli`}
+            className={styles.inspectAction}
+            data-resource-inspect={resource.id}
+            href={internalProfileHref}
+          >
+            Inspect <span aria-hidden="true">→</span>
+          </a>
           {resource.status === "unavailable" ? (
             <span className={styles.unavailableAction}>
               Provider unavailable
             </span>
           ) : (
-            <a href={resource.url} rel="noopener noreferrer" target="_blank">
-              Visit source ↗
+            <a
+              data-resource-visit={resource.id}
+              href={resource.url}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Visit <ExternalArrowIcon />
             </a>
           )}
         </div>
