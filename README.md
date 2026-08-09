@@ -42,12 +42,10 @@ Authentication, cloud workspaces, submissions, moderation, large pattern catalog
 
 ## Active V3 execution loop
 
-V3.0 authority reconciliation is complete. The next independently reviewable slice is **V3.1 — Public IA hygiene**.
+V3.0 authority reconciliation, V3.1 public IA hygiene, and V3.2 AccessRoute pilot are complete. The next independently reviewable slice is **V3.3 — Motion source-guide proof**.
 
 ```text
-V3.1 Public IA hygiene
-→ V3.2 AccessRoute contract pilot
-→ V3.3 Motion source-guide proof
+V3.3 Motion source-guide proof
 → V3.4 Canonical Browse focus
 → V3.5 Homepage task entry
 ```

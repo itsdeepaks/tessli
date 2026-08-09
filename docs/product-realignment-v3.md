@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next implementation slice: **V3.1 — Public IA hygiene**
+Next implementation slice: **V3.3 — Motion source-guide proof**
 
 ## 1. Product definition
 
@@ -430,4 +430,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-Start **V3.1 Public IA hygiene**. It removes public promotion of non-functional routes, makes internal proof/lab surfaces non-indexable and unlinked, and leaves visible page redesign for later dedicated slices.
+Start **V3.3 Source guide vertical proof**. It turns Motion into the first useful human research guide, while keeping Browse, Home, and resource-card consistency in their later dedicated slices.

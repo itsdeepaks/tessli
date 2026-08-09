@@ -5,7 +5,12 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import catalogue from "../data/catalogue.json" with { type: "json" };
+import {
+  ACCESS_ROUTE_KINDS,
+  ACCESS_ROUTE_PILOT_SOURCE_IDS,
+} from "../data/access-route-pilot.ts";
 import { getNativeResourceProfile } from "../lib/mcp-native-tools.ts";
+import { createPublicSourceRepresentation } from "../lib/public-representations.mjs";
 import {
   SOURCE_PROFILE_CONTRACT_VERSION,
   SOURCE_PROFILE_REVIEWED_AT,
@@ -68,6 +73,7 @@ const requiredSourceFields = [
   "platforms",
   "frameworks",
   "integrationMethods",
+  "accessRoutes",
   "limitations",
   "profileLevel",
   "status",
@@ -121,6 +127,63 @@ test("all 295 catalogue resources have one deterministic source profile", () => 
       access: resource.access,
       subscriptionRequired: resource.subscriptionRequired,
     });
+  }
+});
+
+test("AccessRoute is canonical for exactly ten recorded pilot sources and honest for the other 285", () => {
+  assert.equal(ACCESS_ROUTE_PILOT_SOURCE_IDS.length, 10);
+  assert.equal(new Set(ACCESS_ROUTE_PILOT_SOURCE_IDS).size, 10);
+
+  const pilotProfiles = getAllSourceProfiles().filter((profile) =>
+    ACCESS_ROUTE_PILOT_SOURCE_IDS.includes(profile.id),
+  );
+  const fallbackProfiles = getAllSourceProfiles().filter(
+    (profile) => !ACCESS_ROUTE_PILOT_SOURCE_IDS.includes(profile.id),
+  );
+  assert.equal(pilotProfiles.length, 10);
+  assert.equal(fallbackProfiles.length, 285);
+
+  const pilotKinds = new Set(
+    pilotProfiles.flatMap((profile) =>
+      profile.accessRoutes.map((route) => route.kind),
+    ),
+  );
+  for (const kind of [
+    "browser",
+    "documentation",
+    "package-registry",
+    "source-code",
+    "api",
+    "mcp",
+    "cli",
+  ]) {
+    assert.ok(pilotKinds.has(kind), `Missing ${kind} pilot route.`);
+  }
+
+  for (const profile of getAllSourceProfiles()) {
+    assert.equal(
+      profile.accessRoutes.filter((route) => route.preferred).length,
+      1,
+      `${profile.id} must declare exactly one preferred route`,
+    );
+    for (const route of profile.accessRoutes) {
+      assert.ok(ACCESS_ROUTE_KINDS.includes(route.kind));
+      assert.ok(["none", "user", "unknown"].includes(route.auth));
+      assert.ok(route.agentAction.length > 0);
+    }
+  }
+
+  for (const profile of fallbackProfiles) {
+    assert.deepEqual(profile.accessRoutes, [
+      {
+        kind: "browser",
+        url: profile.url,
+        preferred: true,
+        auth: "unknown",
+        agentAction:
+          "Open the canonical provider URL; sign-in and other access requirements are not recorded.",
+      },
+    ]);
   }
 });
 
@@ -232,6 +295,25 @@ test("website-ready source profiles and MCP preserve the same source identity", 
     assert.equal(
       nativeProfile.intelligenceProfile?.resourceId,
       sourceProfile.intelligence?.resourceId,
+    );
+  }
+});
+
+test("website profiles, public representations, and local MCP share exact AccessRoute values", () => {
+  for (const identifier of ["landingfolio", "google-fonts", "designindex"]) {
+    const sourceProfile = getSourceProfile(identifier);
+    assert.ok(sourceProfile);
+    const publicRepresentation =
+      createPublicSourceRepresentation(sourceProfile);
+    const nativeProfile = getNativeResourceProfile(identifier);
+
+    assert.deepEqual(
+      publicRepresentation.source.accessRoutes,
+      sourceProfile.accessRoutes,
+    );
+    assert.deepEqual(
+      nativeProfile.resource.accessRoutes,
+      sourceProfile.accessRoutes,
     );
   }
 });

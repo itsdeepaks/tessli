@@ -135,6 +135,7 @@ export function createPublicSourceRepresentation(profile) {
       platforms: [...profile.platforms],
       frameworks: [...profile.frameworks],
       integrationMethods: [...profile.integrationMethods],
+      accessRoutes: (profile.accessRoutes ?? []).map((route) => ({ ...route })),
       limitations: [...profile.limitations],
       evidence: publicEvidence(profile.evidence),
       intelligence: publicIntelligence(profile),
@@ -286,6 +287,16 @@ export function serializePublicSourceMarkdown(document) {
   pushList(lines, "Platforms", source.platforms);
   pushList(lines, "Frameworks", source.frameworks);
   pushList(lines, "Integration methods", source.integrationMethods);
+  lines.push("## How to access", "");
+  for (const route of source.accessRoutes ?? []) {
+    lines.push(
+      `- **${inline(route.kind)}${route.preferred ? " (preferred)" : ""}:** ${inline(route.agentAction)} Auth: ${inline(route.auth)}.${route.url ? ` (${inline(route.url)})` : ""}`,
+    );
+  }
+  if (!source.accessRoutes || source.accessRoutes.length === 0) {
+    lines.push("None recorded");
+  }
+  lines.push("");
   pushList(lines, "Limitations", source.limitations);
   lines.push("## Evidence", "");
   if (source.evidence.length === 0) {

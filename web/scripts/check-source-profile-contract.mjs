@@ -4,6 +4,10 @@ import { fileURLToPath } from "node:url";
 
 import catalogue from "../data/catalogue.json" with { type: "json" };
 import {
+  ACCESS_ROUTE_PILOT_SOURCE_IDS,
+  ACCESS_ROUTE_KINDS,
+} from "../data/access-route-pilot.ts";
+import {
   SOURCE_PROFILE_CONTRACT_VERSION,
   SOURCE_PROFILE_REVIEWED_AT,
   SOURCE_TYPES,
@@ -81,6 +85,7 @@ export function validateSourceProfileContract() {
   const ids = new Set();
   const slugs = new Set();
   const allowedSourceTypes = new Set(SOURCE_TYPES);
+  const accessRouteKinds = new Set(ACCESS_ROUTE_KINDS);
   const catalogueById = new Map(
     catalogue.resources.map((resource) => [resource.id, resource]),
   );
@@ -168,6 +173,38 @@ export function validateSourceProfileContract() {
           `${profile.id} has an unsupported source type basis.`,
         ),
       );
+    }
+    if (
+      !Array.isArray(profile.accessRoutes) ||
+      profile.accessRoutes.length === 0
+    ) {
+      errors.push(issue("access-routes", `${profile.id} has no access route.`));
+    } else {
+      const preferredRoutes = profile.accessRoutes.filter(
+        (route) => route.preferred,
+      );
+      if (preferredRoutes.length !== 1) {
+        errors.push(
+          issue(
+            "access-route-preferred",
+            `${profile.id} must have exactly one preferred access route.`,
+          ),
+        );
+      }
+      for (const route of profile.accessRoutes) {
+        if (
+          !accessRouteKinds.has(route.kind) ||
+          !["none", "user", "unknown"].includes(route.auth) ||
+          !route.agentAction.trim()
+        ) {
+          errors.push(
+            issue(
+              "access-route-shape",
+              `${profile.id} has an invalid access route.`,
+            ),
+          );
+        }
+      }
     }
     if (profile.profileLevel !== profile.coverage.level) {
       errors.push(
@@ -332,6 +369,14 @@ export function validateSourceProfileContract() {
         "intelligence-count",
         "The reviewed intelligence dataset must contain exactly 40 profiles after Slice 1.4.",
         { actual: summary.intelligenceProfileCount },
+      ),
+    );
+  }
+  if (ACCESS_ROUTE_PILOT_SOURCE_IDS.length !== 10) {
+    errors.push(
+      issue(
+        "access-route-pilot-size",
+        "AccessRoute pilot must contain exactly ten sources.",
       ),
     );
   }

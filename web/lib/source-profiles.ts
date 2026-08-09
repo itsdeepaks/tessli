@@ -1,5 +1,9 @@
 import catalogue from "../data/catalogue.json" with { type: "json" };
 import {
+  getCanonicalAccessRoutes,
+  type AccessRoute,
+} from "../data/access-route-pilot.ts";
+import {
   getAllIntelligenceProfiles,
   getIntelligenceProfile,
   type ResourceIntelligenceProfile,
@@ -76,6 +80,7 @@ export interface SourceProfile {
   platforms: ResourceIntelligenceProfile["platforms"];
   frameworks: ResourceIntelligenceProfile["frameworks"];
   integrationMethods: ResourceIntelligenceProfile["integrationMethods"];
+  accessRoutes: readonly AccessRoute[];
   limitations: ResourceIntelligenceProfile["limitations"];
   profileLevel: SourceCoverageLevel;
   status: SourceStatus;
@@ -233,6 +238,7 @@ function buildSourceProfile(resource: CatalogueResource): SourceProfile {
     platforms: intelligence?.platforms ?? [],
     frameworks: intelligence?.frameworks ?? [],
     integrationMethods: intelligence?.integrationMethods ?? [],
+    accessRoutes: getCanonicalAccessRoutes(resource),
     limitations: intelligence?.limitations ?? [],
     profileLevel,
     status: sourceStatus(resource.status),
