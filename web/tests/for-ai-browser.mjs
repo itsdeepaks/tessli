@@ -125,7 +125,7 @@ await Promise.all([send("Page.enable"), send("Runtime.enable")]);
 await setViewport(1440, 900, false);
 await navigate(
   "/for-ai",
-  'document.querySelectorAll("[data-for-ai-page] .toolCard").length === 7 || document.querySelectorAll("[data-for-ai-page] ol li code").length >= 7',
+  'document.querySelectorAll("[data-for-ai-page] .toolCard").length === 5 || document.querySelectorAll("[data-for-ai-page] ol li code").length >= 5',
 );
 
 assert.equal(await evaluate('document.querySelectorAll("main").length'), 1);
@@ -140,7 +140,7 @@ assert.equal(
   await evaluate(
     'Array.from(document.querySelectorAll("#mcp-tools code")).filter((node) => node.textContent?.includes("_")).length',
   ),
-  7,
+  5,
 );
 assert.equal(
   await evaluate(
