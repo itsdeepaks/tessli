@@ -83,6 +83,11 @@
   cursor: not-allowed;
 }
 
+.recipe {
+  max-width: 48rem;
+  margin: 0;
+}
+
 .status {
   min-height: 1.5em;
   margin: 0;

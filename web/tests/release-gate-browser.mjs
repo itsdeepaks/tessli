@@ -576,7 +576,7 @@ for (const [width, height] of viewports) {
         return {
           audience: audience?.value,
           buttonsEnabled:
-            buttons.length === 2 && buttons.every((button) => !button.disabled),
+            buttons.length === 4 && buttons.every((button) => !button.disabled),
           buttonLabels: buttons.map((button) => button.textContent?.trim()),
           dateValue: date?.value,
           localOnlyCopy: section?.textContent?.includes(
@@ -597,7 +597,7 @@ for (const [width, height] of viewports) {
       );
       assert.deepEqual(
         boardAudit.buttonLabels,
-        ["Copy Markdown", "Download .md"],
+        ["Copy Markdown", "Download .md", "Copy JSON", "Download .json"],
         `Board export labels at ${width}`,
       );
       assert.match(
