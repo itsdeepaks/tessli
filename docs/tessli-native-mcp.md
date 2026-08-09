@@ -1,6 +1,6 @@
 # Tessli Native MCP
 
-Status: **current local MCP v1 implementation guide; V3.8 migration planned**
+Status: **current local MCP v2 implementation guide**
 
 Tessli's current MCP server exposes only repository-managed catalogue and UI-intelligence metadata through a local stdio process. It is the only supported MCP transport today.
 
@@ -47,58 +47,31 @@ Use an absolute path to the Tessli checkout. A generic stdio configuration is:
 
 Some clients use a top-level `servers` key or require an explicit `type: "stdio"`. Follow that client's current MCP configuration format while preserving the same local command and absolute path.
 
-## Current v1 tools
+## Current V3.8 tools
 
-### `search_resources`
+### `find_sources`
 
-Searches committed catalogue text and optional intelligence-profile fields. Results are deterministic and capped at 25.
+Accepts a structured task with optional surface, framework, needs, and exclusions. Returns at most eight deterministic, explained canonical source choices.
 
-Supported filters:
+### `get_source`
 
-- category;
-- access;
-- capability;
-- framework;
-- integration method;
-- workflow fit.
+Returns one exact stable source ID or slug as compact canonical guidance: what it helps with, what to inspect, recorded access routes, caveats, and differentiated alternatives.
 
-### `get_resource_profile`
+### `find_alternatives`
 
-Returns one catalogue resource and its repository intelligence profile when one exists.
-
-### `compare_resources`
-
-Compares two to five unique resources in caller-supplied order.
+Returns one exact source with one to four recorded, differentiated alternatives. It does not rank sources universally or make a live provider comparison.
 
 ### `get_collection`
 
-Returns one published repository collection and its ordered member resources.
+Returns one published Collection by exact ID or slug, preserving editorial stage order and compact canonical source guidance.
 
-### `build_research_plan`
+### `create_research_brief`
 
-Builds a deterministic plan from one to ten selected resources. It does not call an external model or provider.
+Returns a compact, deterministic research handoff from the same structured task retrieval used by `find_sources`.
 
-### `create_reference_packet`
+## V1 replacement boundary
 
-Returns the Markdown reference packet from Tessli's existing Slice 13.4 packet builder.
-
-### `verify_resource`
-
-Reports repository-recorded evidence and dates only. It never performs live website, pricing, terms, availability, or provider verification.
-
-## Planned V3 local MCP
-
-V3.8 follows V3.7 deterministic task retrieval. It will expose five focused capabilities:
-
-- `find_sources`;
-- `get_source`;
-- `find_alternatives`;
-- `get_collection`;
-- `create_research_brief`.
-
-The planned default task result is capped at eight explained choices, not the complete catalogue. It will include task fit, a recorded access route, a limitation, and differentiated alternatives; provenance, freshness, and governance remain optional diagnostics. Existing v1 names remain temporary compatibility aliases during migration. Do not infer a one-to-one alias mapping or the availability of the five names before V3.8.
-
-`verify_resource` remains a diagnostic compatibility path, not a normal agent workflow. V3.2 must establish the canonical `AccessRoute` fields before MCP can expose them. MCP output routes agents to the canonical provider website, documentation, registry, source repository, API, MCP, CLI, or plugin; it does not inspect or use those providers itself.
+The previous seven-tool v1 list is not registered as MCP aliases: registered stdio tools are necessarily visible through `ListTools`, which would contradict the focused five-tool contract. The direct `getNativeResourceProfile` library adapter remains only for an internal source-profile parity check; it is not an MCP tool.
 
 ## Remote MCP availability
 

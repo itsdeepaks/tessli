@@ -23,20 +23,18 @@ async function read(relativePath) {
   return readFile(path.join(webRoot, relativePath), "utf8");
 }
 
-test("shared MCP catalogue preserves the exact seven-tool public contract", () => {
+test("shared MCP catalogue preserves the exact five-tool public contract", () => {
   assert.equal(TESSLI_MCP_SERVER_NAME, "tessli-native-metadata");
-  assert.equal(TESSLI_MCP_SERVER_VERSION, "0.1.0");
+  assert.equal(TESSLI_MCP_SERVER_VERSION, "0.2.0");
   assert.deepEqual(TESSLI_MCP_TOOL_NAMES, [
-    "search_resources",
-    "get_resource_profile",
-    "compare_resources",
+    "find_sources",
+    "get_source",
+    "find_alternatives",
     "get_collection",
-    "build_research_plan",
-    "create_reference_packet",
-    "verify_resource",
+    "create_research_brief",
   ]);
-  assert.equal(TESSLI_MCP_TOOL_CATALOGUE.length, 7);
-  assert.equal(new Set(TESSLI_MCP_TOOL_NAMES).size, 7);
+  assert.equal(TESSLI_MCP_TOOL_CATALOGUE.length, 5);
+  assert.equal(new Set(TESSLI_MCP_TOOL_NAMES).size, 5);
 
   for (const tool of TESSLI_MCP_TOOL_CATALOGUE) {
     assert.ok(tool.title.length > 0);
@@ -51,13 +49,16 @@ test("MCP server consumes shared names and descriptions without expanding scope"
   const server = await read("mcp/server.ts");
 
   assert.match(server, /from "\.\.\/lib\/mcp-tool-catalogue\.ts"/);
-  assert.match(server, /getTessliMcpToolMetadata\("search_resources"\)/);
-  assert.match(server, /getTessliMcpToolMetadata\("verify_resource"\)/);
+  assert.match(server, /getTessliMcpToolMetadata\("find_sources"\)/);
+  assert.match(server, /getTessliMcpToolMetadata\("create_research_brief"\)/);
   assert.match(server, /name: TESSLI_MCP_SERVER_NAME/);
   assert.match(server, /version: TESSLI_MCP_SERVER_VERSION/);
-  assert.match(server, /title: searchResourcesTool\.title/);
-  assert.match(server, /description: verificationTool\.description/);
-  assert.doesNotMatch(server, /find_patterns|get_pattern|project_constraints/);
+  assert.match(server, /title: findSourcesTool\.title/);
+  assert.match(server, /description: researchBriefTool\.description/);
+  assert.doesNotMatch(
+    server,
+    /search_resources|get_resource_profile|compare_resources|verify_resource/,
+  );
   assert.doesNotMatch(server, /Http|SSE|OAuth|\.listen\s*\(/);
 });
 

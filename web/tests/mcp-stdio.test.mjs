@@ -9,7 +9,7 @@ import { TESSLI_MCP_TOOL_NAMES } from "../mcp/server.ts";
 const webRoot = fileURLToPath(new URL("../", import.meta.url));
 const serverPath = fileURLToPath(new URL("../mcp/server.ts", import.meta.url));
 
-test("stdio MCP exposes the exact read-only native tool allowlist", async () => {
+test("stdio MCP exposes only the five focused read-only V3.8 tools", async () => {
   const client = new Client(
     { name: "tessli-mcp-test-client", version: "1.0.0" },
     { capabilities: {} },
@@ -25,6 +25,13 @@ test("stdio MCP exposes the exact read-only native tool allowlist", async () => 
     await client.connect(transport);
     const listed = await client.listTools();
 
+    assert.deepEqual(TESSLI_MCP_TOOL_NAMES, [
+      "find_sources",
+      "get_source",
+      "find_alternatives",
+      "get_collection",
+      "create_research_brief",
+    ]);
     assert.deepEqual(
       listed.tools.map((tool) => tool.name),
       [...TESSLI_MCP_TOOL_NAMES],
@@ -38,41 +45,43 @@ test("stdio MCP exposes the exact read-only native tool allowlist", async () => 
       ),
     );
 
-    const searchResult = await client.callTool({
-      name: "search_resources",
-      arguments: { query: "landingfolio", limit: 3 },
-    });
-
-    assert.notEqual(searchResult.isError, true);
-    assert.ok(searchResult.structuredContent);
-    assert.equal(searchResult.structuredContent.result.total, 1);
-    assert.equal(
-      searchResult.structuredContent.result.resources[0].slug,
-      "landingfolio",
-    );
-    assert.equal(
-      searchResult.structuredContent.result.resources[0].profileAvailable,
-      true,
-    );
-
-    const packetResult = await client.callTool({
-      name: "create_reference_packet",
+    const sourceResult = await client.callTool({
+      name: "find_sources",
       arguments: {
-        taskName: "MCP integration test",
-        identifiers: ["landingfolio", "shadcn-ui"],
-        generatedAt: "2026-08-01",
+        task: "Build a React animation",
+        surface: "page transitions",
+        framework: "react",
+        needs: ["page transitions"],
       },
     });
 
-    assert.notEqual(packetResult.isError, true);
-    assert.equal(packetResult.structuredContent.result.resourceCount, 2);
-    assert.match(
-      packetResult.structuredContent.result.markdown,
-      /# Tessli Reference Packet — MCP integration test/,
+    assert.notEqual(sourceResult.isError, true);
+    assert.ok(sourceResult.structuredContent);
+    assert.ok(sourceResult.structuredContent.result.sources.length <= 8);
+    assert.ok(
+      sourceResult.structuredContent.result.sources.some(
+        (source) => source.slug === "motion",
+      ),
+    );
+
+    const briefResult = await client.callTool({
+      name: "create_research_brief",
+      arguments: {
+        task: "Build a React animation",
+        surface: "page transitions",
+        framework: "react",
+        needs: ["page transitions"],
+      },
+    });
+
+    assert.notEqual(briefResult.isError, true);
+    assert.equal(
+      briefResult.structuredContent.result.sourceCount,
+      sourceResult.structuredContent.result.sources.length,
     );
 
     const unknownResult = await client.callTool({
-      name: "verify_resource",
+      name: "get_source",
       arguments: { identifier: "not-a-tessli-resource" },
     });
     assert.equal(unknownResult.isError, true);
@@ -97,5 +106,10 @@ test("MCP source preserves the local read-only security boundary", async () => {
   assert.doesNotMatch(combined, /console\.log/);
   assert.doesNotMatch(combined, /\bwriteFile\b/);
   assert.doesNotMatch(combined, /\breadFile\b/);
-  assert.doesNotMatch(combined, /Landingfolio.*token/i);
+  assert.doesNotMatch(combined, /localStorage|sessionStorage|indexedDB/i);
+  assert.doesNotMatch(combined, /provider token|service[- ]role/i);
+  assert.doesNotMatch(
+    combined,
+    /verify_resource|search_resources|compare_resources/,
+  );
 });

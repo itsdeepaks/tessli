@@ -159,7 +159,7 @@ Requirements:
 - no provider credentials stored by Tessli;
 - no proxying or persistence of paid/private content.
 
-V3.8 follows V3.7 and migrates the local server to five focused capabilities: `find_sources`, `get_source`, `find_alternatives`, `get_collection`, and `create_research_brief`. Existing tool names remain temporary compatibility aliases during that migration; no exact alias mapping is implied before V3.8. `verify_resource` remains a diagnostic compatibility path rather than a normal agent workflow.
+V3.8 follows V3.7 and exposes five focused capabilities: `find_sources`, `get_source`, `find_alternatives`, `get_collection`, and `create_research_brief`. The v1 tool list is not registered as MCP aliases because every registered stdio tool is necessarily public through `ListTools`; direct library adapters remain only where an existing internal parity check needs them. `verify_resource` is not part of the normal MCP workflow.
 
 Remote Streamable HTTP MCP is deferred to V3.16, after local task retrieval and compact public outputs stabilise. It must use the same pure tool layer and public data only, with read-only allowlists, bounded input, origin validation, rate limits, safe logs, timeouts, and monitoring. It must not read browser-local Boards, write Tessli state, fetch providers, proxy paid/private content, or accept provider credentials.
 
