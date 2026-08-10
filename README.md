@@ -42,12 +42,12 @@ Authentication, cloud workspaces, submissions, moderation, large pattern catalog
 
 ## Active V3 execution loop
 
-V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, V3.8 local MCP v2, V3.9 compact public machine representations, V3.10 machine discovery, V3.11 Collections as research paths, V3.12 Saved-to-Board flow, V3.13 Board agent handoff, V3.14 For AI redesign, and V3.15 live-preview pilot are complete. The next slice, **V3.16 — Hosted remote MCP**, needs a public-transport and security decision before it may begin.
+V3.0 authority reconciliation, V3.1 public IA hygiene, V3.2 AccessRoute pilot, V3.3 Motion source-guide proof, V3.4 Canonical Browse focus, V3.5 Homepage task entry, V3.6 resource-card consistency, V3.7 deterministic task retrieval, V3.8 local MCP v2, V3.9 compact public machine representations, V3.10 machine discovery, V3.11 Collections as research paths, V3.12 Saved-to-Board flow, V3.13 Board agent handoff, V3.14 For AI redesign, and V3.15 live-preview pilot are complete. V3.16’s disabled-by-default transport preflight is implemented; enabling hosted remote MCP still needs a public-transport and security decision.
 
 ```text
 V3.14 For AI redesign (complete)
 → V3.15 Live-preview pilot (complete)
-→ V3.16 Hosted remote MCP (public transport and security decision required)
+→ V3.16 Hosted remote MCP preflight (disabled by default; public transport and security decision required)
 ```
 
 Machine work follows the stable source-guide contract:
@@ -57,7 +57,7 @@ V3.7 deterministic task retrieval
 → V3.8 local MCP v2
 → V3.9 compact public representations
 → V3.10 machine discovery (complete)
-→ V3.16 remote MCP
+→ V3.16 remote MCP preflight (disabled by default)
 → V3.17 supported cross-model validation
 ```
 
@@ -101,7 +101,7 @@ The repository currently contains five read-only local-MCP-v2 tools:
 - `get_collection`;
 - `create_research_brief`.
 
-These tools use deterministic task retrieval, source guidance, alternatives, Collections, and research briefs. A hosted remote MCP does not exist yet; it is deferred to V3.16 after the local contract is stable.
+These tools use deterministic task retrieval, source guidance, alternatives, Collections, and research briefs. V3.16 now contains a disabled-by-default remote-MCP transport preflight; no hosted endpoint is publicly enabled until its transport, abuse-limit, monitoring, and security decision is complete.
 
 ## Boundaries
 

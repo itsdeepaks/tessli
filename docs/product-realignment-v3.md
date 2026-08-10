@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next gated slice: **V3.16 — Hosted remote MCP (public transport and security decision required)**
+Next gated slice: **V3.16 — Hosted remote MCP (preflight complete; public transport and security decision required)**
 
 ## 1. Product definition
 
@@ -291,26 +291,26 @@ Remote Streamable HTTP MCP follows only after task retrieval and compact outputs
 
 ## 11. Ordered implementation slices
 
-| ID    | Slice                             | Outcome                                                                                                          | Primary ownership                                              | Depends on              |
-| ----- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ----------------------- |
-| V3.0  | Authority reconciliation          | Product direction, PRD, build plan, page/component contracts, README agree on the human-curated AI-native router | Documentation only                                             | DONE                    |
-| V3.1  | Public IA hygiene                 | Only useful public routes and navigation remain; placeholders and internal routes are unpromoted/noindex         | Header, footer, sitemap, route metadata                        | V3.0                    |
-| V3.2  | AccessRoute contract pilot        | One canonical access vocabulary for ten high-value sources using existing evidence                               | Schema, profile adapter, data fixtures, contract tests         | V3.0                    |
-| V3.3  | Source guide vertical proof       | Motion becomes the reference human page and Listed pages degrade honestly                                        | Source Detail page/components/styles, Board action integration | V3.2                    |
-| V3.4  | Canonical Browse focus            | Task-first source finding without coverage/audit framing                                                         | `/resources`, Browse controls/cards/tests                      | V3.2, V3.3              |
-| V3.5  | Homepage task entry               | Home routes intent into Browse and does not duplicate the catalogue                                              | `/`, home-only components/styles/tests                         | V3.4                    |
-| V3.6  | Resource-card consistency         | Preview, Inspect, Save, and Visit behave consistently across Browse, Collections, and Saved                      | Shared resource card/media only                                | V3.3, V3.4              |
-| V3.7  | Deterministic task retrieval      | Structured brief returns at most eight sources with reasons, caveats, alternatives, and access routes            | Pure retrieval library/tests                                   | V3.2                    |
-| V3.8  | Local MCP v2                      | Five focused read-only tools use the same task retrieval and source truth                                        | MCP catalogue/server/tool tests                                | V3.7                    |
-| V3.9  | Public machine representations v2 | Compact action-oriented source/Collection JSON and Markdown                                                      | Representation formatter/routes/tests                          | V3.7                    |
-| V3.10 | Machine discovery                 | `robots.txt`, `llms.txt`, sitemap and For AI links make supported interfaces discoverable                        | Metadata routes and discovery tests                            | V3.9                    |
-| V3.11 | Collections as research paths     | Guided task stages flow naturally into a Board                                                                   | Collection pages/components/tests                              | V3.3, V3.6              |
-| V3.12 | Saved-to-Board flow               | A shortlist can become project decisions without an account                                                      | Saved/Boards/source-to-board components/tests                  | V3.3, V3.6              |
-| V3.13 | Board agent handoff               | Compact JSON joins Markdown; model-neutral usage recipe is documented                                            | Board export formatter/UI/tests                                | V3.12                   |
-| V3.14 | For AI redesign                   | DONE — `/for-ai` explains the real human-to-agent workflow and current setup truth                               | `/for-ai` only                                                 | V3.8–V3.10, V3.13       |
-| V3.15 | Live-preview pilot                | DONE — shadcn/ui allowlisted iframe enhancement with a static fallback                                           | Source preview component/security tests                        | V3.3; separate approval |
-| V3.16 | Hosted remote MCP                 | Public read-only Streamable HTTP facade with limits and monitoring                                               | Server transport/deployment/security                           | V3.8–V3.10              |
-| V3.17 | Cross-model validation            | Exact supported setup paths proven with OpenAI, Claude, and Gemini                                               | Integration evidence/docs                                      | V3.16; provider access  |
+| ID    | Slice                             | Outcome                                                                                                             | Primary ownership                                              | Depends on              |
+| ----- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ----------------------- |
+| V3.0  | Authority reconciliation          | Product direction, PRD, build plan, page/component contracts, README agree on the human-curated AI-native router    | Documentation only                                             | DONE                    |
+| V3.1  | Public IA hygiene                 | Only useful public routes and navigation remain; placeholders and internal routes are unpromoted/noindex            | Header, footer, sitemap, route metadata                        | V3.0                    |
+| V3.2  | AccessRoute contract pilot        | One canonical access vocabulary for ten high-value sources using existing evidence                                  | Schema, profile adapter, data fixtures, contract tests         | V3.0                    |
+| V3.3  | Source guide vertical proof       | Motion becomes the reference human page and Listed pages degrade honestly                                           | Source Detail page/components/styles, Board action integration | V3.2                    |
+| V3.4  | Canonical Browse focus            | Task-first source finding without coverage/audit framing                                                            | `/resources`, Browse controls/cards/tests                      | V3.2, V3.3              |
+| V3.5  | Homepage task entry               | Home routes intent into Browse and does not duplicate the catalogue                                                 | `/`, home-only components/styles/tests                         | V3.4                    |
+| V3.6  | Resource-card consistency         | Preview, Inspect, Save, and Visit behave consistently across Browse, Collections, and Saved                         | Shared resource card/media only                                | V3.3, V3.4              |
+| V3.7  | Deterministic task retrieval      | Structured brief returns at most eight sources with reasons, caveats, alternatives, and access routes               | Pure retrieval library/tests                                   | V3.2                    |
+| V3.8  | Local MCP v2                      | Five focused read-only tools use the same task retrieval and source truth                                           | MCP catalogue/server/tool tests                                | V3.7                    |
+| V3.9  | Public machine representations v2 | Compact action-oriented source/Collection JSON and Markdown                                                         | Representation formatter/routes/tests                          | V3.7                    |
+| V3.10 | Machine discovery                 | `robots.txt`, `llms.txt`, sitemap and For AI links make supported interfaces discoverable                           | Metadata routes and discovery tests                            | V3.9                    |
+| V3.11 | Collections as research paths     | Guided task stages flow naturally into a Board                                                                      | Collection pages/components/tests                              | V3.3, V3.6              |
+| V3.12 | Saved-to-Board flow               | A shortlist can become project decisions without an account                                                         | Saved/Boards/source-to-board components/tests                  | V3.3, V3.6              |
+| V3.13 | Board agent handoff               | Compact JSON joins Markdown; model-neutral usage recipe is documented                                               | Board export formatter/UI/tests                                | V3.12                   |
+| V3.14 | For AI redesign                   | DONE — `/for-ai` explains the real human-to-agent workflow and current setup truth                                  | `/for-ai` only                                                 | V3.8–V3.10, V3.13       |
+| V3.15 | Live-preview pilot                | DONE — shadcn/ui allowlisted iframe enhancement with a static fallback                                              | Source preview component/security tests                        | V3.3; separate approval |
+| V3.16 | Hosted remote MCP                 | PREFLIGHT DONE — disabled-by-default stateless Streamable HTTP adapter; public facade still requires security proof | Server transport/deployment/security                           | V3.8–V3.10              |
+| V3.17 | Cross-model validation            | Exact supported setup paths proven with OpenAI, Claude, and Gemini                                                  | Integration evidence/docs                                      | V3.16; provider access  |
 
 ## 12. Slice acceptance and exclusions
 
@@ -372,11 +372,17 @@ Exclusions: embeddings, vector database, LLM ranking, public endpoint, remote MC
 
 ### V3.16 — remote MCP
 
-Acceptance:
+Preflight acceptance (implemented, disabled by default):
 
 - Streamable HTTP wraps the same pure tool layer as local MCP;
-- public data only, read-only allowlist, input limits, origin validation, rate limits, safe logs, timeouts, and deployment monitoring exist;
-- local MCP remains supported;
+- public data only, read-only allowlist, bounded JSON input, exact host/origin validation, security headers, and a bounded best-effort in-memory rate guard;
+- the route returns 404 unless explicitly enabled, rejects malformed or wildcard allowlists, and does not parse disabled requests;
+- no Board, provider, credential, request-body log, cache-write, or MCP-write path is reachable;
+- local MCP remains supported.
+
+Public enablement gate (not implemented by this preflight):
+
+- trusted proxy identity, production abuse limits, monitoring/alerting, deployment configuration, and incident ownership must be proven before exposure;
 - provider compatibility is claimed only after V3.17 evidence.
 
 Exclusions: private Boards, writes, auth accounts, provider proxying, credentials.
@@ -432,4 +438,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-V3.15 is complete. Do not begin **V3.16 Hosted remote MCP** without a public-transport and security decision: it would expose an externally reachable read-only service and requires deployment, abuse limits, monitoring, and cross-model setup evidence.
+V3.15 is complete and the V3.16 transport preflight is implemented. Do not enable or deploy **V3.16 Hosted remote MCP** without a public-transport and security decision: it would expose an externally reachable read-only service and requires deployment, abuse limits, monitoring, and cross-model setup evidence.
