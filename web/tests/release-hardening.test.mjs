@@ -224,7 +224,7 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.15 Live-preview pilot DEFERRED — separate approval required\*\*/,
+    /Status: \*\*active delivery plan — V3\.16 Hosted remote MCP DEFERRED — public transport and security decision required\*\*/,
   );
   assert.match(
     slices,
@@ -273,6 +273,10 @@ test("release history remains preserved while V3 drives active execution", async
   assert.match(
     slices,
     tableRow("V3.14", "For AI redesign", "DONE", "V3.8–V3.10, V3.13"),
+  );
+  assert.match(
+    slices,
+    tableRow("V3.15", "Live-preview pilot", "DONE", "V3.3; separate approval"),
   );
   assert.match(slices, /## 7\. Historical V2 phase status/);
   assert.match(
@@ -349,16 +353,16 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. \*\*V3\.14 For AI redesign is complete\.\*\* V3\.15 remains separately approval-gated/,
+    /V3\.0 replaced this continuation boundary\. \*\*V3\.14 For AI redesign and the V3\.15 shadcn\/ui live-preview pilot are complete\.\*\* V3\.16 remains deployment- and security-gated/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
   assert.match(
     readme,
-    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, V3\.9 compact public machine representations, V3\.10 machine discovery, V3\.11 Collections as research paths, V3\.12 Saved-to-Board flow, V3\.13 Board agent handoff, and V3\.14 For AI redesign are complete\./,
+    /V3\.0 authority reconciliation, V3\.1 public IA hygiene, V3\.2 AccessRoute pilot, V3\.3 Motion source-guide proof, V3\.4 Canonical Browse focus, V3\.5 Homepage task entry, V3\.6 resource-card consistency, V3\.7 deterministic task retrieval, V3\.8 local MCP v2, V3\.9 compact public machine representations, V3\.10 machine discovery, V3\.11 Collections as research paths, V3\.12 Saved-to-Board flow, V3\.13 Board agent handoff, V3\.14 For AI redesign, and V3\.15 live-preview pilot are complete\./,
   );
   assert.match(
     readme,
-    /The next slice, \*\*V3\.15 — Live-preview pilot\*\*, needs separate approval before it may begin\./i,
+    /The next slice, \*\*V3\.16 — Hosted remote MCP\*\*, needs a public-transport and security decision before it may begin\./i,
   );
   assert.match(
     slices,
