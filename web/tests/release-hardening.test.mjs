@@ -224,7 +224,7 @@ test("release history remains preserved while V3 drives active execution", async
   }
   assert.match(
     slices,
-    /Status: \*\*active delivery plan — V3\.16 Hosted remote MCP DEFERRED — public transport and security decision required\*\*/,
+    /Status: \*\*active delivery plan — V3\.16 Hosted remote MCP PROOF — preflight complete; public transport and security decision required\*\*/,
   );
   assert.match(
     slices,
@@ -353,7 +353,7 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     slices,
-    /V3\.0 replaced this continuation boundary\. \*\*V3\.14 For AI redesign and the V3\.15 shadcn\/ui live-preview pilot are complete\.\*\* V3\.16 remains deployment- and security-gated/,
+    /V3\.0 replaced this continuation boundary\. \*\*V3\.14 For AI redesign and the V3\.15 shadcn\/ui live-preview pilot are complete\.\*\* V3\.16’s disabled-by-default transport preflight is implemented; enabling or deploying it remains security-gated/,
   );
   assert.match(slices, /Proof and UI Judgment:.*Slice 5\.3 remains BLOCKED/is);
   assert.match(
@@ -362,7 +362,7 @@ test("release history remains preserved while V3 drives active execution", async
   );
   assert.match(
     readme,
-    /The next slice, \*\*V3\.16 — Hosted remote MCP\*\*, needs a public-transport and security decision before it may begin\./i,
+    /V3\.16’s disabled-by-default transport preflight is implemented; enabling hosted remote MCP still needs a public-transport and security decision\./i,
   );
   assert.match(
     slices,
