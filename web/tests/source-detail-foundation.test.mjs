@@ -49,6 +49,7 @@ test("source detail follows the V3.3 guide-first reading order", () => {
   }
 
   assert.match(page, /<SourceActions resource=\{card\}/);
+  assert.match(page, /<LivePreview resourceId=\{profile\.id\}/);
   assert.match(page, /className=\{styles\.preview\}/);
   assert.match(page, /referrerPolicy="no-referrer"/);
   assert.match(page, /previewMark/);

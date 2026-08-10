@@ -3,7 +3,7 @@
 Status: **active product and execution plan**
 Planning slice: **complete**
 Authority reconciliation: **V3.0 DONE — 2026-08-08**
-Next gated slice: **V3.15 — Live-preview pilot (separate approval required)**
+Next gated slice: **V3.16 — Hosted remote MCP (public transport and security decision required)**
 
 ## 1. Product definition
 
@@ -308,7 +308,7 @@ Remote Streamable HTTP MCP follows only after task retrieval and compact outputs
 | V3.12 | Saved-to-Board flow               | A shortlist can become project decisions without an account                                                      | Saved/Boards/source-to-board components/tests                  | V3.3, V3.6              |
 | V3.13 | Board agent handoff               | Compact JSON joins Markdown; model-neutral usage recipe is documented                                            | Board export formatter/UI/tests                                | V3.12                   |
 | V3.14 | For AI redesign                   | DONE — `/for-ai` explains the real human-to-agent workflow and current setup truth                               | `/for-ai` only                                                 | V3.8–V3.10, V3.13       |
-| V3.15 | Live-preview pilot                | Allowlisted iframe enhancement for a maximum of three embeddable sources with fallback                           | Source preview component/security tests                        | V3.3; separate approval |
+| V3.15 | Live-preview pilot                | DONE — shadcn/ui allowlisted iframe enhancement with a static fallback                                           | Source preview component/security tests                        | V3.3; separate approval |
 | V3.16 | Hosted remote MCP                 | Public read-only Streamable HTTP facade with limits and monitoring                                               | Server transport/deployment/security                           | V3.8–V3.10              |
 | V3.17 | Cross-model validation            | Exact supported setup paths proven with OpenAI, Claude, and Gemini                                               | Integration evidence/docs                                      | V3.16; provider access  |
 
@@ -412,7 +412,7 @@ Complete V3.0–V3.7. A person and a local agent can use the same ten-source tru
 
 ### AI-ready local product
 
-Complete V3.8–V3.14. Local MCP, public representations, discovery files, Board handoff, and For AI present one coherent workflow.
+Complete V3.8–V3.15. Local MCP, public representations, discovery files, Board handoff, For AI, and the bounded live-preview pilot present one coherent workflow.
 
 ### Cross-model hosted product
 
@@ -432,4 +432,4 @@ Complete V3.16–V3.17. The same read-only retrieval works through supported Ope
 
 ## 16. Immediate next slice
 
-V3.14 is complete. Do not begin **V3.15 Live-preview pilot** without separate approval: it introduces an allowlisted embedded-provider enhancement with security, framing, performance, and fallback obligations.
+V3.15 is complete. Do not begin **V3.16 Hosted remote MCP** without a public-transport and security decision: it would expose an externally reachable read-only service and requires deployment, abuse limits, monitoring, and cross-model setup evidence.
