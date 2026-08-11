@@ -313,6 +313,20 @@ test("completed records reject invalid chronology and unperformed checks", () =>
   );
 });
 
+test("records cannot begin before the exact canonical profile was reviewed", () => {
+  const draft = createResourceVerificationDraft({
+    identifier: "google-fonts",
+    reviewerId: "operator-1",
+    startedAt: "2026-08-06",
+  });
+  draft.startedAt = "2026-08-04";
+
+  const result = validateResourceVerificationRecord(draft);
+  assert.equal(result.valid, false);
+  assert.equal(result.eligibleForPromotion, false);
+  assert.match(result.errors.join(" "), /earlier than profileReviewedAt/u);
+});
+
 test("completed needs-review records are valid but never promotion eligible", () => {
   const draft = createResourceVerificationDraft({
     identifier: "google-fonts",
@@ -354,6 +368,31 @@ test("only a complete verified record becomes eligible for later promotion", () 
     validateResourceVerificationRecord(missingTerms).errors.join(" "),
     /termsUrl/u,
   );
+
+  const documentationOnlyApi = structuredCloneJson(record);
+  documentationOnlyApi.interfaceChecks[0].method = "document-review";
+  const documentationOnlyResult =
+    validateResourceVerificationRecord(documentationOnlyApi);
+  assert.equal(documentationOnlyResult.eligibleForPromotion, false);
+  assert.match(
+    documentationOnlyResult.errors.join(" "),
+    /requires manual-api-test/u,
+  );
+
+  const documentationOnlyAvailability = structuredCloneJson(record);
+  documentationOnlyAvailability.availabilityCheck.method = "document-review";
+  assert.match(
+    validateResourceVerificationRecord(
+      documentationOnlyAvailability,
+    ).errors.join(" "),
+    /manual-browser/u,
+  );
+
+  const expiredResult = validateResourceVerificationRecord(record, {
+    asOfDate: "2026-11-05",
+  });
+  assert.equal(expiredResult.eligibleForPromotion, false);
+  assert.match(expiredResult.errors.join(" "), /recheckBy is stale/u);
 });
 
 test("CLI drafts and checks temporary draft, needs-review, and verified records", () => {

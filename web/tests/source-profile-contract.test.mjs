@@ -20,13 +20,19 @@ import {
   getSourceContractSummary,
   getSourceCoverageCounts,
   getSourceProfile,
+  isPromotionAlignedWithHumanReview,
 } from "../lib/source-profiles.ts";
+import { getAllVerifiedPromotions } from "../lib/verified-promotions.ts";
 import { validateSourceProfileContract } from "../scripts/check-source-profile-contract.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const schemaPath = path.join(
   __dirname,
   "../../schemas/source-profile.schema.json",
+);
+const intelligenceSchemaPath = path.join(
+  __dirname,
+  "../../schemas/resource-intelligence-profile.schema.json",
 );
 
 const batch13Identifiers = [
@@ -104,6 +110,19 @@ test("source profile schema defines the complete canonical v1 contract", () => {
     "verified",
   ]);
   assert.equal(SOURCE_PROFILE_REVIEWED_AT, "2026-08-05");
+});
+
+test("intelligence profiles define explicit human-review provenance", () => {
+  const schema = JSON.parse(fs.readFileSync(intelligenceSchemaPath, "utf8"));
+  assert.equal(schema.properties.humanReview.$ref, "#/$defs/humanReview");
+  assert.equal(schema.$defs.humanReview.additionalProperties, false);
+  assert.equal(schema.$defs.humanReview.properties.status.const, "completed");
+  assert.deepEqual(schema.$defs.humanReview.required, [
+    "status",
+    "reviewerId",
+    "reviewedAt",
+    "verificationRecordPath",
+  ]);
 });
 
 test("all 295 catalogue resources have one deterministic source profile", () => {
@@ -188,6 +207,7 @@ test("AccessRoute is canonical for exactly ten recorded pilot sources and honest
 });
 
 test("coverage baseline is truthful: 255 Listed, 40 Profiled, 0 Verified", () => {
+  assert.deepEqual(getAllVerifiedPromotions(), []);
   assert.deepEqual(getSourceCoverageCounts(), {
     listed: 255,
     profiled: 40,
@@ -229,7 +249,60 @@ test("Profiled records expose normalized intelligence without losing evidence", 
   assert.deepEqual(relume.evidence, relume.intelligence.evidence);
   assert.equal(
     deriveCoverageLevel(relume.intelligence, "completed"),
+    "profiled",
+  );
+  assert.equal(
+    deriveCoverageLevel(relume.intelligence, "completed", true),
     "verified",
+  );
+});
+
+test("explicit promotion cannot substitute for profile human-review provenance", () => {
+  const radix = getSourceProfile("radix-ui");
+  assert.ok(radix?.intelligence);
+  const promotion = {
+    resourceId: radix.id,
+    resourceSlug: radix.slug,
+    recordPath: "verification-records/1.6/radix-ui.json",
+    profileSha256: "a".repeat(64),
+    completedAt: "2026-08-06",
+    reviewerId: "human-reviewer",
+    recheckBy: "2026-11-04",
+  };
+
+  assert.equal(
+    isPromotionAlignedWithHumanReview(radix.intelligence, promotion),
+    false,
+  );
+  assert.equal(
+    isPromotionAlignedWithHumanReview(
+      {
+        ...radix.intelligence,
+        humanReview: {
+          status: "completed",
+          reviewerId: "human-reviewer",
+          reviewedAt: "2026-08-06",
+          verificationRecordPath: "verification-records/1.6/radix-ui.json",
+        },
+      },
+      promotion,
+    ),
+    true,
+  );
+  assert.equal(
+    isPromotionAlignedWithHumanReview(
+      {
+        ...radix.intelligence,
+        humanReview: {
+          status: "completed",
+          reviewerId: "human-reviewer",
+          reviewedAt: "2026-08-06",
+          verificationRecordPath: "verification-records/1.6/radix-ui.json",
+        },
+      },
+      { ...promotion, recheckBy: "2026-08-04" },
+    ),
+    false,
   );
 });
 

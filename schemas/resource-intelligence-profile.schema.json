@@ -191,6 +191,9 @@
       "items": {
         "$ref": "#/$defs/evidence"
       }
+    },
+    "humanReview": {
+      "$ref": "#/$defs/humanReview"
     }
   },
   "$defs": {
@@ -428,6 +431,36 @@
             "likely",
             "unknown"
           ]
+        }
+      }
+    },
+    "humanReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewerId",
+        "reviewedAt",
+        "verificationRecordPath"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "completed"
+        },
+        "reviewerId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "^[^\\s]+$"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "verificationRecordPath": {
+          "type": "string",
+          "pattern": "^verification-records/[a-z0-9]+(?:[.-][a-z0-9]+)*/[a-z0-9]+(?:-[a-z0-9]+)*\\.json$"
         }
       }
     }

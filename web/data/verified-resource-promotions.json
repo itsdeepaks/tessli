@@ -1,0 +1,10 @@
+{
+  "contract": "tessli.verified-resource-promotions.v1",
+  "promotions": [],
+  "recordCount": 0,
+  "source": {
+    "path": "verification-records/promotions.json",
+    "sha256": "e5f9a16e89fc663776242b616e8de3204dda787888a191c6b1403bb978d394c9"
+  },
+  "version": 1
+}

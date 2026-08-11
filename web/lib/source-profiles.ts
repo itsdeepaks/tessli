@@ -8,6 +8,10 @@ import {
   getIntelligenceProfile,
   type ResourceIntelligenceProfile,
 } from "./intelligence.ts";
+import {
+  getVerifiedPromotion,
+  type VerifiedResourcePromotion,
+} from "./verified-promotions.ts";
 
 export const SOURCE_PROFILE_CONTRACT_VERSION = 1 as const;
 export const SOURCE_PROFILE_REVIEWED_AT = "2026-08-05" as const;
@@ -38,13 +42,6 @@ export type FreshnessStatus = "current" | "aging" | "stale" | "unknown";
 export type SourceStatus = "active" | "inactive" | "unknown";
 
 type CatalogueResource = (typeof catalogue.resources)[number];
-
-type ReviewAwareIntelligenceProfile = ResourceIntelligenceProfile & {
-  humanReview?: {
-    status?: string;
-    reviewedAt?: string;
-  };
-};
 
 export interface SourceAccessModel {
   access: string;
@@ -148,16 +145,38 @@ export function deriveEvidenceConfidence(
 function deriveHumanReviewStatus(
   profile: ResourceIntelligenceProfile | null,
 ): HumanReviewStatus {
-  const review = (profile as ReviewAwareIntelligenceProfile | null)
-    ?.humanReview;
-  return review?.status === "completed" && isIsoDate(review.reviewedAt)
+  const review = profile?.humanReview;
+  return review?.status === "completed" &&
+    Boolean(review.reviewerId.trim()) &&
+    isIsoDate(review.reviewedAt) &&
+    Boolean(review.verificationRecordPath.trim())
     ? "completed"
     : "not-recorded";
+}
+
+export function isPromotionAlignedWithHumanReview(
+  profile: ResourceIntelligenceProfile | null,
+  promotion: VerifiedResourcePromotion | null,
+): boolean {
+  const review = profile?.humanReview;
+  return Boolean(
+    profile &&
+    promotion &&
+    review?.status === "completed" &&
+    (profile.resourceId === promotion.resourceId ||
+      profile.resourceId === promotion.resourceSlug) &&
+    review.reviewerId === promotion.reviewerId &&
+    review.reviewedAt === promotion.completedAt &&
+    review.verificationRecordPath === promotion.recordPath &&
+    isIsoDate(promotion.recheckBy) &&
+    promotion.recheckBy >= SOURCE_PROFILE_REVIEWED_AT,
+  );
 }
 
 export function deriveCoverageLevel(
   profile: ResourceIntelligenceProfile | null,
   humanReviewStatus = deriveHumanReviewStatus(profile),
+  promotionRecorded = false,
 ): SourceCoverageLevel {
   if (!profile) return "listed";
 
@@ -170,6 +189,7 @@ export function deriveCoverageLevel(
   if (
     profile.status === "verified" &&
     humanReviewStatus === "completed" &&
+    promotionRecorded &&
     hasRecordedEvidence
   ) {
     return "verified";
@@ -186,12 +206,12 @@ function coverageReason(
     return "Catalogue identity and access metadata are present; no structured intelligence profile is linked.";
   }
   if (level === "verified") {
-    return "Structured intelligence, evidence, verification date, confidence, and explicit human review are recorded.";
+    return "Structured intelligence, evidence, verification date, confidence, explicit human review, and explicit promotion are recorded.";
   }
   if (humanReviewStatus === "not-recorded") {
     return "Structured intelligence and evidence are present; explicit human-review provenance is not recorded.";
   }
-  return "Structured intelligence is present but the full Verified coverage contract is incomplete.";
+  return "Structured intelligence and human review are present but the explicit Verified promotion contract is incomplete.";
 }
 
 function sourceStatus(status: string): SourceStatus {
@@ -209,9 +229,23 @@ function intelligenceForResource(
 
 function buildSourceProfile(resource: CatalogueResource): SourceProfile {
   const intelligence = intelligenceForResource(resource);
+  const promotion =
+    getVerifiedPromotion(resource.id) ?? getVerifiedPromotion(resource.slug);
   const humanReviewStatus = deriveHumanReviewStatus(intelligence);
-  const profileLevel = deriveCoverageLevel(intelligence, humanReviewStatus);
+  const promotionAligned = isPromotionAlignedWithHumanReview(
+    intelligence,
+    promotion,
+  );
+  const profileLevel = deriveCoverageLevel(
+    intelligence,
+    humanReviewStatus,
+    promotionAligned,
+  );
   const sourceType = SOURCE_TYPE_BY_CATEGORY[resource.category];
+  const lastVerifiedAt =
+    (promotionAligned ? promotion?.completedAt : null) ??
+    intelligence?.verifiedAt ??
+    null;
 
   if (!sourceType) {
     throw new Error(`No source type classification for ${resource.category}.`);
@@ -242,16 +276,16 @@ function buildSourceProfile(resource: CatalogueResource): SourceProfile {
     limitations: intelligence?.limitations ?? [],
     profileLevel,
     status: sourceStatus(resource.status),
-    verifiedAt: intelligence?.verifiedAt ?? null,
+    verifiedAt: lastVerifiedAt,
     evidence: intelligence?.evidence ?? [],
     coverage: {
       level: profileLevel,
       reason: coverageReason(profileLevel, humanReviewStatus),
       profileStatus: intelligence?.status ?? null,
-      lastVerifiedAt: intelligence?.verifiedAt ?? null,
+      lastVerifiedAt,
       confidence: deriveEvidenceConfidence(intelligence),
       humanReviewStatus,
-      freshnessStatus: deriveFreshnessStatus(intelligence?.verifiedAt ?? null),
+      freshnessStatus: deriveFreshnessStatus(lastVerifiedAt),
       evidenceCount: intelligence?.evidence.length ?? 0,
     },
     intelligence,

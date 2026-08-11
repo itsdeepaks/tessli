@@ -4,7 +4,11 @@ import {
   getIntelligenceProfile,
   type ResourceIntelligenceProfile,
 } from "./intelligence.ts";
-import { getSourceProfile, type SourceProfile } from "./source-profiles.ts";
+import {
+  SOURCE_PROFILE_REVIEWED_AT,
+  getSourceProfile,
+  type SourceProfile,
+} from "./source-profiles.ts";
 
 export const RESOURCE_VERIFICATION_CONTRACT =
   "tessli.resource-verification.v1" as const;
@@ -361,8 +365,25 @@ function exactInterfaceSet(
   );
 }
 
+function requiredInterfaceReviewMethod(
+  check: ResourceVerificationRecord["interfaceChecks"][number],
+): ResourceVerificationRecord["interfaceChecks"][number]["method"] {
+  if (check.type === "api") return "manual-api-test";
+  if (check.type === "cli" || check.type === "sdk") {
+    return "manual-cli-test";
+  }
+  if (check.type === "plugin") return "manual-browser";
+  if (check.type === "mcp") {
+    return check.transport === "stdio" || check.transport === "local-process"
+      ? "manual-cli-test"
+      : "manual-api-test";
+  }
+  return "not-run";
+}
+
 export function validateResourceVerificationRecord(
   record: ResourceVerificationRecord,
+  options: { asOfDate?: string } = {},
 ): VerificationValidationResult {
   const errors: string[] = [];
   let target:
@@ -426,7 +447,24 @@ export function validateResourceVerificationRecord(
     errors.push("A non-blank human-operator reviewer ID is required.");
   }
 
+  const profileReviewedAt = requireDate(
+    record.profileReviewedAt,
+    "profileReviewedAt",
+    errors,
+  );
+  const asOfDate = requireDate(
+    options.asOfDate ?? SOURCE_PROFILE_REVIEWED_AT,
+    "asOfDate",
+    errors,
+  );
   const startedAt = requireDate(record.startedAt, "startedAt", errors);
+  if (
+    profileReviewedAt !== null &&
+    startedAt !== null &&
+    startedAt < profileReviewedAt
+  ) {
+    errors.push("startedAt cannot be earlier than profileReviewedAt.");
+  }
 
   if (record.status === "draft") {
     if (record.completedAt !== null) {
@@ -587,11 +625,21 @@ export function validateResourceVerificationRecord(
     if (completedAt !== null && recheckBy !== null && recheckBy < completedAt) {
       errors.push("freshness.recheckBy cannot be earlier than completedAt.");
     }
+    if (asOfDate !== null && recheckBy !== null && recheckBy < asOfDate) {
+      errors.push(
+        "freshness.recheckBy is stale for the current source-profile review date.",
+      );
+    }
   }
 
   if (record.decision === "verified") {
     if (record.availabilityCheck.result !== "passed") {
       errors.push("Verified decisions require a passed availability check.");
+    }
+    if (record.availabilityCheck.method !== "manual-browser") {
+      errors.push(
+        "Verified decisions require canonical availability to be checked with manual-browser.",
+      );
     }
     if (record.claimChecks.some((check) => check.result !== "confirmed")) {
       errors.push("Verified decisions require every claim to be confirmed.");
@@ -601,6 +649,14 @@ export function validateResourceVerificationRecord(
         "Verified decisions require every recorded interface to pass.",
       );
     }
+    record.interfaceChecks.forEach((check, index) => {
+      const requiredMethod = requiredInterfaceReviewMethod(check);
+      if (check.method !== requiredMethod) {
+        errors.push(
+          `Verified interfaceChecks[${index}] requires ${requiredMethod}; documentation review alone cannot pass an interface.`,
+        );
+      }
+    });
     for (const field of [
       "persistence",
       "redistribution",

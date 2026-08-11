@@ -16,6 +16,8 @@
     "source-profiles:check": "node scripts/check-source-profile-contract.mjs",
     "verification:draft": "node scripts/resource-verification.mjs draft",
     "verification:check": "node scripts/resource-verification.mjs check",
+    "verification:promotions:generate": "node scripts/generate-verification-promotions.mjs --generate",
+    "verification:promotions:check": "node scripts/generate-verification-promotions.mjs --check",
     "media:review:generate": "node scripts/generate-resource-media-review.mjs",
     "media:review:check": "node scripts/check-resource-media-candidates.mjs",
     "media:coverage:generate": "node scripts/generate-resource-media-coverage.mjs",
@@ -28,7 +30,7 @@
     "mcp": "node mcp/server.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "node --test tests/*.test.mjs && node scripts/check-intelligence-profiles.mjs && node scripts/check-source-profile-contract.mjs && node scripts/check-resource-media-candidates.mjs && node scripts/check-resource-media-coverage.mjs",
+    "test": "node --test tests/*.test.mjs && node scripts/check-intelligence-profiles.mjs && node scripts/check-source-profile-contract.mjs && node scripts/generate-verification-promotions.mjs --check && node scripts/check-resource-media-candidates.mjs && node scripts/check-resource-media-coverage.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

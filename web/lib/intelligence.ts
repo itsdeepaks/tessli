@@ -64,6 +64,12 @@ export interface ResourceIntelligenceProfile {
     verifiedAt: string;
     confidence?: string;
   }>;
+  humanReview?: {
+    status: "completed";
+    reviewerId: string;
+    reviewedAt: string;
+    verificationRecordPath: string;
+  };
 }
 
 const rawProfiles: ResourceIntelligenceProfile[] = [

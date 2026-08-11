@@ -53,7 +53,7 @@ Completed records cannot retain `pending` checks. A `verified` decision requires
 
 Every documented MCP, API, CLI, SDK, or plugin interface is copied into the draft. The record stores only credential-handling classification such as `user-owned-not-recorded`; it never stores tokens, passwords, cookies, API keys, or session values.
 
-A `verified` decision requires each recorded interface to pass. Sources without documented agent interfaces have an empty interface list.
+A `verified` decision requires each recorded interface to pass through the matching manual method. HTTP APIs and remote MCP transports require `manual-api-test`; CLIs, SDKs, stdio MCP, and local-process MCP require `manual-cli-test`; in-product plugins require `manual-browser`. Documentation review alone cannot pass an interface. Sources without documented agent interfaces have an empty interface list.
 
 ### 3.4 Governance
 
@@ -64,7 +64,7 @@ The operator reviews:
 - attribution;
 - current terms or licence documentation.
 
-A verified record requires all four to be confirmed. Asset-specific licences still prevail over a source-level summary.
+A verified record requires all four to be confirmed. Canonical provider availability must also be observed through `manual-browser`; documentation review alone is insufficient. Asset-specific licences still prevail over a source-level summary.
 
 ### 3.5 Limitations and freshness
 
@@ -73,7 +73,7 @@ The operator confirms that the profile limitations were reviewed and records:
 - freshness status;
 - a future or same-day recheck deadline.
 
-A verified decision requires `current` freshness and a recheck date not earlier than completion.
+A verified decision requires `current` freshness and a recheck date not earlier than completion or Tessli's deterministic current source-profile review date. Once that bounded recheck date is stale, the record is no longer promotion-eligible and public coverage falls back to Profiled until review is renewed.
 
 ## 4. Decisions
 
